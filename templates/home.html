@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+
+{% block nav %}
+<ul>
+    <li><a href="/">MAPS</a>
+        <ul class="dropdown-1">
+            <li><a href="/battle_map">BATTLE MAP</a></li>
+            <li><a href="/tfc_control_map">TFC CONTROL MAP</a></li>
+            <li><a href="/loc_board">LOC BOARD</a></li>
+        </ul>
+    </li>
+
+    <li><a href="/">REPORTS & RETURNS</a>
+        <ul class="dropdown-1">
+            <li><a href="/record_of_work">RECORD OF WORK</a></li>
+            <li><a href="/repair_state">REPAIR STATE</a></li>
+            <li><a href="/rec_state">REC STATE</a></li>
+            <li><a href="/vor_eoa_state">VOR/EOA STATE</a></li>
+            <li><a href="/battle_board">BATTLE BOARD</a></li>
+            <li><a href="/recurring">RECURRING</a></li>
+            <li><a href="/fault">FAULT</a></li>
+        </ul>
+    </li>
+
+    <li><a href="/cas_reports">CAS REPORTS</a>
+    </li>
+
+    <li><a href="/">REPAIR AND REC DEC</a>
+        <ul class="dropdown-1">
+            <li><a href="/avt_lr">AVT LR</a></li>
+            <li><a href="/avt_fr">AVT FR</a></li>
+            <li><a href="/mrt">MRT</a></li>
+            <li><a href="/mcrt">MCRT</a></li>
+            <li><a href="/awd">AWD</a></li>
+        </ul>
+    </li>
+
+    <li><a href="/mua_spares">MUA/SPARES</a></li>
+</ul>
+{% endblock %}
