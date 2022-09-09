@@ -11,30 +11,27 @@ Session(app)
 
 globeOne = '1234'
 
-def login_required(func):
-    def modified_func():
-        user = session.get("name", "newbie")
-        if user == "newbie":
-            return redirect("/login")
-        if user != "admin":
-            return "Your Not Admin"
-        
-        return func
-    return modified_func
-
-@app.route("/login")
-@login_required
+@app.route("/login", methods = ("POST", "GET"))
 def login():
+    
     if request.method == "POST":
+        print("hello")
         username = request.form.get("username")
         password = request.form.get("password")
-        if password == globeOne:
+        if password == globeOne and username == "admin":
             session['name'] = username
+            return redirect("/")
+        else:
+            return render_template("login.html", message = "Either username or password are wrong")
     return render_template("login.html")
 
 @app.route("/")
-@login_required
 def home():
+    user = session.get("name", "newbie")
+    if user == "newbie":
+        return redirect("/login")
+    if user != "admin":
+        return "Your Not Admin"
     return render_template("home.html")
 
 battle_board_table = {
@@ -118,8 +115,13 @@ tables = {
     "recurring_fault_db" : recurring_fault_db, 
 }
 @app.route("/<name>", methods = ("POST", "GET"))
-@login_required
 def battle_board(name):
+    user = session.get("name", "newbie")
+    if user == "newbie":
+        return redirect("/login")
+    if user != "admin":
+        return "Your Not Admin"
+    
     table = tables[name]
     headers = list(table.keys())
 
@@ -143,8 +145,13 @@ def battle_board(name):
 
 
 @app.route("/download/<name>")
-@login_required
 def download_file(name):
+    user = session.get("name", "newbie")
+    if user == "newbie":
+        return redirect("/login")
+    if user != "admin":
+        return "Your Not Admin"
+    
     table = tables[name]
     headers = list(table.keys())
     n = len(table[headers[0]])
@@ -169,14 +176,28 @@ def download_file(name):
     )
 
 @app.route("/battle_map")
-@login_required
 def battle_map():
+    user = session.get("name", "newbie")
+    if user == "newbie":
+        return redirect("/login")
+    if user != "admin":
+        return "Your Not Admin"
+    
     return render_template("battle_map.html")
 
 @app.route("/tfc_control_map")
-@login_required
 def tfc_control_map():
+    user = session.get("name", "newbie")
+    if user == "newbie":
+        return redirect("/login")
+    if user != "admin":
+        return "Your Not Admin"
+    
     return render_template("tfc_control_map.html")
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html')
 
 if __name__ == "__main__":
     app.run(debug = True)
