@@ -122,6 +122,9 @@ def battle_board(name):
     if user != "admin":
         return "Your Not Admin"
     
+    if name not in tables:
+        return redirect("/")
+
     table = tables[name]
     headers = list(table.keys())
 
@@ -143,7 +146,6 @@ def battle_board(name):
         name = name,
     )
 
-
 @app.route("/download/<name>")
 def download_file(name):
     user = session.get("name", "newbie")
@@ -152,6 +154,9 @@ def download_file(name):
     if user != "admin":
         return "Your Not Admin"
     
+    if name not in tables:
+        return redirect("/")
+
     table = tables[name]
     headers = list(table.keys())
     n = len(table[headers[0]])
