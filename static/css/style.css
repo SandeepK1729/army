@@ -73,3 +73,6 @@
 .dropdown-1 li:hover{
 	display: block;
 } 
+input:text {
+	margin:0;
+}

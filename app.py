@@ -51,11 +51,11 @@ def battle_board(name):
     if request.method == "POST":
         delete_key = request.form.get("DELETE", -1)
         if delete_key != -1:
-            remove(name, headers[0], delete_key)
+            remove(table_name = name, value = delete_key)
         else:
-            add(name, headers, request.form)
+            add(table_name = name, keys = headers, dict = request.form)
 
-    data = load(name, headers[0], request.form.get('search', ''))
+    data = load(table_name = name, key = headers[0], value = request.form.get('search', ''))
     return render_template(
         "table.html",
         table = data, 
@@ -75,28 +75,38 @@ def download_file(name):
     if name not in tables:
         return redirect("/")
 
-    table = tables[name]
-    headers = list(table.keys())
-    n = len(table[headers[0]])
+    path = 'static/files/csv/download.csv'
+    csv_generate(name)
 
-    file = []
-    for i in range(n):
-        row = {}
-        for header in headers:
-            row[header] = table[header][i]
-        file.append(row)
-    
-    with open('static/files/download.csv', 'w') as csvfile:
-        writer = DictWriter(csvfile, fieldnames = headers)
-        writer.writeheader()
-        writer.writerows(file)
-    
     return send_file(
-        'static/files/download.csv', 
+        path, 
         as_attachment = True, 
         mimetype='text/csv', 
         download_name = f"{name}.csv"
     )
+
+"""@app.route("/print/<name>")
+def print_file(name):
+    user = session.get("name", "newbie")
+    if user == "newbie":
+        return redirect("/login")
+    if user != "admin":
+        return "Your Not Admin"
+    
+    if name not in tables:
+        return redirect("/")
+    
+    csv_generate(name)
+    path = 'static/files/pdf/download.pdf'
+    pdf_generate()
+
+    return send_file(
+        path, 
+        as_attachment = True, 
+        mimetype='text/pdf', 
+        download_name = f"{name}.pdf"
+    )
+"""
 
 @app.route("/battle_map")
 def battle_map():

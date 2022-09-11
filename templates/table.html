@@ -2,7 +2,9 @@
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block styling %}{% endblock %}
+{% block styling %}
+    input { margin : 0; }
+{% endblock %}
 
 {% block title_head %}{{ title }}{% endblock %}
     
@@ -15,34 +17,41 @@
                     {% for header in headers %}
                         <th scope="col"> {{ header }} </th>
                     {% endfor %}
-                    <th scope="col">Remove</th>
+                    <th scope="col">REMOVE</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
                 {% for row in table %}
                     <tr scope="row" class="table-data">
                         {% for i in range(row|length) %}
-                            <td>{{ row[i] }}</td>
+                            <td class="table-data text-center">{{ row[i] }}</td>
                         {% endfor %}
-                        <td><form method="post">
+                        <td class="m-0"><form method="post">
                             <input type="hidden" name="DELETE" value="{{ row[0] }}">
-                            <input type="submit" value="REMOVE" class="btn btn-primary">
+                            <input type="submit" value="REMOVE" class="btn btn-secondary rounded">
                         </form></td>
                     </tr>
                 {% endfor %}
-                </tr>
                 <form method = "POST">
-                    <tr scope="row">
-                        {% for header in headers %}
-                            <td class="table-data"><input type="text" name="{{ header }}" id="{{ header }}" required></td>
-                        {% endfor %}
-                        <td><input type="submit" value="Add" class="btn btn-primary"></td>
-                    </tr>
+                    
+                <tr scope="row">
+                    <div style="">
+                            {% for header in headers %}
+                                <td class="table-data ">
+                                    <input type="text" name="{{ header }}" id="{{ header }}" class="m-0 w-100" required>
+                                </td>
+                            {% endfor %}
+                            <td><input type="submit" value="Add" class="btn btn-primary m-0"></td>
+                    
+                    </div>
+                </tr> 
                 </form>
             </tbody>
         </table>
 
         <a href="/download/{{ name }}" class="btn btn-primary">Download</a>
+        <a href="/print/{{ name }}" class="btn btn-primary">Print</a>
+        
     </div>
 
 {% endblock %}
