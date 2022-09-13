@@ -25,23 +25,30 @@ def login():
             return render_template("login.html", message = "Either username or password are wrong")
     return render_template("login.html")
 
+@app.route('/logout')
+def logout():
+    session['name'] = 'newbie'
+    return redirect('/')
+
+def login_required(func):
+    def m_func():
+        user = session.get("name", "newbie")
+        if user == "newbie":
+            return redirect("/login")
+        if user != "admin":
+            return "Your Not Admin"
+        return func()
+
+    return m_func 
+
 @app.route("/")
+@login_required
 def home():
-    user = session.get("name", "newbie")
-    if user == "newbie":
-        return redirect("/login")
-    if user != "admin":
-        return "Your Not Admin"
     return render_template("home.html")
 
 @app.route("/<name>", methods = ("POST", "GET"))
+@login_required
 def battle_board(name):
-    user = session.get("name", "newbie")
-    if user == "newbie":
-        return redirect("/login")
-    if user != "admin":
-        return "Your Not Admin"
-    
     if name not in tables:
         print(name)
         return redirect("/")
@@ -66,13 +73,8 @@ def battle_board(name):
     )
 
 @app.route("/update", methods = ("POST", "GET"))
+@login_required
 def cat_pat(name = "spares"):
-    user = session.get("name", "newbie")
-    if user == "newbie":
-        return redirect("/login")
-    if user != "admin":
-        return "Your Not Admin"
-    
     if name not in tables:
         print(name)
         return redirect("/")
@@ -84,13 +86,8 @@ def cat_pat(name = "spares"):
     return redirect(f'/{name}')
 
 @app.route("/download/<name>")
+@login_required
 def download_file(name):
-    user = session.get("name", "newbie")
-    if user == "newbie":
-        return redirect("/login")
-    if user != "admin":
-        return "Your Not Admin"
-    
     if name not in tables:
         return redirect("/")
 
@@ -105,13 +102,8 @@ def download_file(name):
     )
 
 @app.route("/print/<name>")
+@login_required
 def print_file(name):
-    user = session.get("name", "newbie")
-    if user == "newbie":
-        return redirect("/login")
-    if user != "admin":
-        return "Your Not Admin"
-    
     if name not in tables:
         return redirect("/")
     
@@ -128,13 +120,8 @@ def print_file(name):
 
 
 @app.route("/<name>_map")
+@login_required
 def battle_map(name):
-    user = session.get("name", "newbie")
-    if user == "newbie":
-        return redirect("/login")
-    if user != "admin":
-        return "Your Not Admin"
-    
     return render_template("map.html", name = (" ".join(name.split('_')).upper() + " MAP"))
 
 @app.errorhandler(404)
