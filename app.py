@@ -60,9 +60,28 @@ def battle_board(name):
         "table.html",
         table = data, 
         headers = headers, 
-        title = " ".join(name.split("_")), 
+        title = " ".join(name.split("_")).upper(), 
         name = name,
+        update_form = (name == "spares")
     )
+
+@app.route("/update", methods = ("POST", "GET"))
+def cat_pat(name = "spares"):
+    user = session.get("name", "newbie")
+    if user == "newbie":
+        return redirect("/login")
+    if user != "admin":
+        return "Your Not Admin"
+    
+    if name not in tables:
+        print(name)
+        return redirect("/")
+
+    headers = tables[name]
+
+    if request.method == "POST":
+        update(table_name = name, col = 'CAT PART NO', dict = request.form)
+    return redirect(f'/{name}')
 
 @app.route("/download/<name>")
 def download_file(name):
@@ -85,7 +104,7 @@ def download_file(name):
         download_name = f"{name}.csv"
     )
 
-"""@app.route("/print/<name>")
+@app.route("/print/<name>")
 def print_file(name):
     user = session.get("name", "newbie")
     if user == "newbie":
@@ -106,27 +125,17 @@ def print_file(name):
         mimetype='text/pdf', 
         download_name = f"{name}.pdf"
     )
-"""
 
-@app.route("/battle_map")
-def battle_map():
+
+@app.route("/<name>_map")
+def battle_map(name):
     user = session.get("name", "newbie")
     if user == "newbie":
         return redirect("/login")
     if user != "admin":
         return "Your Not Admin"
     
-    return render_template("battle_map.html")
-
-@app.route("/tfc_control_map")
-def tfc_control_map():
-    user = session.get("name", "newbie")
-    if user == "newbie":
-        return redirect("/login")
-    if user != "admin":
-        return "Your Not Admin"
-    
-    return render_template("tfc_control_map.html")
+    return render_template("map.html", name = (" ".join(name.split('_')).upper() + " MAP"))
 
 @app.errorhandler(404)
 def page_not_found(e):

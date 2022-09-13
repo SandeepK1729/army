@@ -72,11 +72,18 @@ recurring_fault_db = [
 ]
 avr_lr = [
     "ARMY NO", 
+    "DATE",
     "RANK", 
     "NAME", 
     "TRADE", 
     "MOB NO", 
     "REMARKS",
+]
+spares = [
+    'NAME OF SPARE', 
+    'SECTION NO', 
+    'CAT PART NO', 
+    'QTY', 
 ]
 tables = { 
     "battle_board" : battle_board_table, 
@@ -86,4 +93,5 @@ tables = {
     "vor_eoa_state" : vor_eoa_state, 
     "recurring_fault_db" : recurring_fault_db,
     "avt_lr" : avr_lr,
+    'spares' : spares,
 }

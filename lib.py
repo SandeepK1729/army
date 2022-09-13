@@ -1,7 +1,9 @@
 from sqlite3 import connect
 from data import tables
 import pandas as pd
-#import pdfkit
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+import pypandoc 
 
 def add(table_name, keys, dict):
     """
@@ -50,16 +52,39 @@ def csv_generate(name):
     path = 'static/files/csv/download.csv'
     keys = tables[name]
     data = load(table_name = name)
-    with open(path, 'w') as file:
-        file.write(",".join([f'"{key}"' for key in keys]) + '\n')
-        for row in data:
-            file.write(",".join(row) + '\n')
-        
-"""def pdf_generate():
+    df = pd.DataFrame(data, columns = keys)
+    df.to_csv(path)
+
+def update(table_name, col, dict):
+    x = dict['v1']
+    y = dict['v2']
+    col = chr(65 + tables[table_name].index(col))
+
+    with connect('database.db') as con:
+        cur = con.cursor()
+        cmds = [
+            f"update {table_name} set {col} = 'temp' where {col} = '{x}';", 
+            f"update {table_name} set {col} = '{x}'  where {col} = '{y}';",
+            f"update {table_name} set {col} = '{y}' where {col} = 'temp';",
+        ]
+        for cmd in cmds:
+            cur.execute(cmd) 
+        con.commit() 
+
+
+def pdf_generate():
     root ='static/files/csv/download.csv'
     path = 'static/files/pdf/download.pdf'
 
-    df = pd.read_csv(root)
+    """df = pd.read_csv(root)
     html_string = df.to_html()
-    pdfkit.from_string(html_string, path )
-    """
+
+    path_wkhtmltopdf = r'D:\Softwares\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+    pdfkit.from_string(html_string, path)
+    config = pdfkit.configuration(wkhtmltopdf='/path/to/wkhtmltopdf')
+    pdfkit.from_file(root, path, configuration=config )"""
+
+    output = pypandoc.convert_file(root, 'pdf', outputfile=path)
+    assert output == ""
