@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, send_file, session, redirect
 from lib import *
 from flask_session import Session  
 from data import tables 
+from functools import wraps
 
 app = Flask(__name__)
 
@@ -31,38 +32,31 @@ def logout():
     return redirect('/')
 
 def login_required(func):
-    def m_func():
+    @wraps(func)
+    def m_func(*args, **kwargs):
         user = session.get("name", "newbie")
         if user == "newbie":
             return redirect("/login")
         if user != "admin":
             return "Your Not Admin"
-        return func()
+        return func(*args, **kwargs)
 
     return m_func 
 
-@app.route("/")
-@login_required
-def home():
-    return render_template("home.html")
-
-@app.route("/<name>", methods = ("POST", "GET"))
-@login_required
-def battle_board(name):
-    if name not in tables:
-        print(name)
-        return redirect("/")
-
-    headers = tables[name]
+@app.route('/avt_lr')
+@app.route('/avt_fr')
+@app.route('/mrt')
+def conncec():
+    name = list(request.path.split('/'))[-1]
+    headers = tables[name]['columns']
 
     if request.method == "POST":
-        delete_key = request.form.get("DELETE", -1)
-        if delete_key != -1:
-            remove(table_name = name, value = delete_key)
-        else:
-            add(table_name = name, keys = headers, dict = request.form)
+        add(table_name = name, keys = headers, dict = request.form)
 
-    data = load(table_name = name, key = headers[0], value = request.form.get('search', ''))
+    data = load(
+        table_name = name,
+        value = request.args.get('search', '')
+    )
     return render_template(
         "table.html",
         table = data, 
@@ -72,6 +66,42 @@ def battle_board(name):
         update_form = (name == "spares")
     )
 
+@app.route("/")
+@login_required
+def home():
+    return render_template("home.html")
+
+@app.route("/<name>", methods = ("POST", "GET"))
+@login_required
+def tables_db(name):
+    headers = tables[name]['columns']
+
+    if request.method == "POST":
+        add(table_name = name, keys = headers, dict = request.form)
+
+    data = load(
+        table_name = name,
+        value = request.args.get('search', '')
+    )
+    return render_template(
+        "table.html",
+        table = data, 
+        headers = headers, 
+        title = " ".join(name.split("_")).upper(), 
+        name = name,
+        update_form = (name == "spares")
+    )
+
+@app.route('/<name>/delete', methods = ("POST", "GET"))
+@login_required
+def delete_rec(name):
+    remove(
+        table_name = name, 
+        value = request.form.get("DELETE", -1)
+    )
+    root = list(request.path.split('/'))[1]
+    return redirect(f'/{root}')
+
 @app.route("/update", methods = ("POST", "GET"))
 @login_required
 def cat_pat(name = "spares"):
@@ -79,7 +109,7 @@ def cat_pat(name = "spares"):
         print(name)
         return redirect("/")
 
-    headers = tables[name]
+    headers = tables[name]['columns']
 
     if request.method == "POST":
         update(table_name = name, col = 'CAT PART NO', dict = request.form)
@@ -117,7 +147,6 @@ def print_file(name):
         mimetype='text/pdf', 
         download_name = f"{name}.pdf"
     )
-
 
 @app.route("/<name>_map")
 @login_required

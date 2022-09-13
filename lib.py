@@ -24,16 +24,19 @@ def add(table_name, keys, dict):
         except:
             return f"{keys[0]} must be unique"
 
-def load(table_name, value = "", key = 'A'):
+def load(table_name, value = ""):
     """
         def load(table_name, key, value):
     """
+    key = chr(tables[table_name]['search_column'] + 65)
+
     with connect('database.db') as con:
         cur = con.cursor()
         cmd = f"SELECT * FROM {table_name}" 
         if value != "":
-            cmd += f" WHERE {key} LIKE '%{value}%';"
-        cur.execute(cmd)
+            cmd += f" WHERE {key} LIKE '%{value}%'"
+        print(cmd)
+        cur.execute(cmd + ';')
         
         return cur.fetchall()
 
@@ -50,7 +53,7 @@ def remove(table_name, value, key = 'A'):
 
 def csv_generate(name):
     path = 'static/files/csv/download.csv'
-    keys = tables[name]
+    keys = tables[name]['columns']
     data = load(table_name = name)
     df = pd.DataFrame(data, columns = keys)
     df.to_csv(path)
@@ -58,7 +61,7 @@ def csv_generate(name):
 def update(table_name, col, dict):
     x = dict['v1']
     y = dict['v2']
-    col = chr(65 + tables[table_name].index(col))
+    col = chr(65 + tables[table_name]['columns'].index(col))
 
     with connect('database.db') as con:
         cur = con.cursor()
@@ -70,7 +73,6 @@ def update(table_name, col, dict):
         for cmd in cmds:
             cur.execute(cmd) 
         con.commit() 
-
 
 def pdf_generate():
     root ='static/files/csv/download.csv'
