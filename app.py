@@ -228,7 +228,7 @@ def tables_db():
 def delete_rec(name):
     remove(
         table_name = name, 
-        value = request.form.get("DELETE", -1)
+        values = request.form.get("DELETE", -1)
     )
     root = list(request.path.split('/'))[1]
     return redirect(f'/{root}')

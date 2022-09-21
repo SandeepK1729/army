@@ -118,8 +118,15 @@ def remove(table_name, values, keys = -1):
     
     with connect('database.db') as con:
         cur = con.cursor()
-        cmd = f"""DELETE FROM {table_name} WHERE 
-            {" AND ".join(f"{chr(idx + 65)} = {cast_type(cols[idx], value)}" for idx, value in zip(idxs, values))};"""
+        cmd = f"DELETE FROM {table_name} WHERE "
+            
+        if "list" in str(type(values)) or "tuple" in str(type(values)):
+            cmd += " AND ".join(f"{chr(idx + 65)} = {cast_type(cols[idx], value)}" for idx, value in zip(idxs, values))
+        else:
+            cmd += f"{chr(65 + idxs)} = {cast_type(cols[idxs], values)}"
+        
+        cmd += ';'
+
         print(cmd)
         cur.execute(cmd)
         con.commit()
