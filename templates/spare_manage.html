@@ -1,6 +1,6 @@
 
 <div class="container">
-    <h1>Usage Of Spare : {{ name_of_spare[0] }}</h1>
+    <h1>Usage Of Spare : {{ name_of_spare }}</h1>
     <table class="table table-striped table-bordered table-hover">
         <thead>
             <tr>
@@ -16,7 +16,7 @@
                 <tr scope="row" class="table-data">
                     <form method="post">
                         <div>
-                            <input type="hidden" name="UPDATE_SPARE_DATA" value="{{ cat_part_no }}">
+                            <input type="hidden" name="UPDATE_SPARE_DATA" value="{{ row[0] }}">
                             <input type="hidden" name="NAME OF SPARE" value="{{ name_of_spare }}">
                             <input type="hidden" name="CAT PART NO" value="{{ cat_part_no }}">
                         

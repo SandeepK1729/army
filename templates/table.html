@@ -47,12 +47,20 @@
                 <form method = "POST">
                     <tr scope="row">
                         <div >
-                                {% for rec in headers %}
-                                    <td class="table-data" >
-                                        <input type="{{ rec[1] }}" name="{{ rec[0] }}" id="{{ rec[0] }}" class="m-0 w-100" required>
-                                    </td>
-                                {% endfor %}
-                                <td><input type="submit" value="Add" class="btn btn-primary m-0"></td>
+                            {% for i in range(headers|length) %}
+                                <td class="table-data" >
+                                    {% if headers[i][1] == "select" %}
+                                        <select name="{{ headers[i][0] }}" id="{{ headers[i][0] }}">
+                                            {% for type in choices[headers[i][0]] %}
+                                                <option value="{{ type }}">{{ type }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                        <input type="{{ headers[i][1] }}" name="{{ headers[i][0] }}" id="{{ headers[i][0] }}" class="m-0 w-100" required>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                            <td><input type="submit" value="Add" class="btn btn-primary m-0"></td>
                         
                         </div>
                     </tr> 

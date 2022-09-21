@@ -1,7 +1,8 @@
+from secrets import choice
 from flask import Flask, request, render_template, send_file, session, redirect
 from lib import *
 from flask_session import Session  
-from data import get_type, tables 
+from data import get_type, tables, choices
 from functools import wraps
 
 app = Flask(__name__)
@@ -92,7 +93,7 @@ def dets(name = "dets"):
     return render_template(
         "dets.html",
         table = data, 
-        det_types = ['AVT LR', 'AVT FR', 'MRT'],
+        choices = choices,
         headers = [(name, get_type(name)) for name in headers], 
         title = " ".join(name.split("_")).upper(), 
         name = name,
@@ -105,8 +106,7 @@ def dets(name = "dets"):
 def spares():
     name = list(request.path.split('/'))[-1]
     headers = tables[name]['columns'][1:]
-    print(headers)
-
+    
     if request.method == "POST":
         if "ADD" in request.form:
             add(table_name = name, keys = headers, dict = request.form)
@@ -114,7 +114,7 @@ def spares():
             add(table_name = name, keys = tables[name]['columns'], dict = request.form)
         
         if "UPDATE_SPARE_DATA" in request.form:
-            special_update(name, request.form)
+            special_update(name, request.form, primes = ('CAT PART NO', 'DET NAME'))
         if "DELETE" in request.form:
             remove(
                 name, 
@@ -127,7 +127,7 @@ def spares():
         value = request.args.get('search', '')
     )
 
-    print(request.form)
+    print("\n\n\n")
     if request.method == "POST" and "show_spare" in request.form:
         name_of_spare = request.form.get("NAME OF SPARE")
         cat_part_no = request.form.get("CAT PART NO")
@@ -219,6 +219,7 @@ def tables_db():
         headers = [(name, get_type(name)) for name in headers], 
         title = " ".join(name.split("_")).upper(), 
         name = name,
+        choices = choices,
         update_form = (name == "spares"),
         search_key = request.args.get("search", "")
     )

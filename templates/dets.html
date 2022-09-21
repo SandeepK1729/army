@@ -49,7 +49,7 @@
                                 <td class="table-data" >
                                     {% if headers[i][1] == "select" %}
                                         <select name="{{ headers[i][0] }}" id="{{ headers[i][0] }}">
-                                            {% for type in det_types %}
+                                            {% for type in choices[headers[i][0]] %}
                                                 <option value="{{ type }}">{{ type }}</option>
                                             {% endfor %}
                                         </select>

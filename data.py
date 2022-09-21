@@ -103,7 +103,7 @@ dets = {
         "MOB NO",
         "REMARKS",
     ], 
-    'search_column' : 2,
+    'search_column' : 0,
     #'primary_key' : 1,
 }
 spares = {
@@ -132,9 +132,14 @@ type = {
     "SER" : 'number',
     "UNIT" : 'number', 
     'DET TYPE' : 'select',
+    'SYSTEM' : 'select',
     'SER NO' : 'text',
     'QTY' : 'number',
     'CAT PART NO' : 'text',
+}
+choices = {
+    'DET TYPE' : ['AVT LR', 'AVT FR', 'MRT', 'MRCT', 'AWD'],
+    'SYSTEM' : ['COOLING', 'WAIN', 'BOOSTER', 'GAIR', 'ENGINE']
 }
 def get_type(name, production = False):
     

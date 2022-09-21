@@ -29,31 +29,38 @@ def add(table_name, keys, dict):
         except:
             return f"{keys[0]} must be unique"
 
-def special_update(table_name, dict):
+def special_update(table_name, dict, primes = -1):
     table = tables[table_name]
     cols = table['columns']
-    prime_col = table.get('primary_key', 0)
+    primes = [table['columns'][table.get('primary_key', 0)]] if primes == -1 else primes
     
-    print(dict)
     data = []
     for i in range(len(cols)):
-        if cols[i] in dict and i != prime_col:
-            data.append((chr(i + 65), cast_type(cols[i], dict[cols[i]])))
-    print(data)
-    prime_key, prime_value = (chr(65 + prime_col), cast_type(cols[prime_col], dict[cols[prime_col]]))
-
+        if cols[i] in dict:
+            data.append(f"{chr(i + 65)} = {cast_type(cols[i], dict[cols[i]])}")
+    print(dict)
+    
     with connect('database.db') as con:
         cur = con.cursor()
         try:
             cmd = f"""
-                UPDATE {table_name} 
-                SET {", ".join([f"{key} = {value}" for key, value in data])}
-                WHERE {prime_key} = {prime_value};
-            """
-            print(cmd)
-            print(cur.execute(cmd))
+                    SELECT ZZZ from {table_name} 
+                    WHERE A {f"= '{dict['UPDATE_SPARE_DATA']}'" if dict['UPDATE_SPARE_DATA'] != 'None' else "IS NULL"}
+                    AND
+                    D = '{dict['CAT PART NO']}';
+                """
+            cur.execute(cmd)
+            
+            e = cur.fetchone()
+            cmd  = f"""
+                    UPDATE {table_name} 
+                    SET {", ".join(data)}
+                    WHERE ZZZ = {e[0]};
+                """
+            
             con.commit()
-        except:
+        except Exception as e:
+            print(e)
             return "null"
 
 def load(table_name, keys = "", value = ""):
@@ -66,7 +73,7 @@ def load(table_name, keys = "", value = ""):
     key_name = table['columns'][table['search_column']]
 
     with connect('database.db') as con:
-        cmd = f"SELECT * FROM {table_name}" 
+        cmd = f'SELECT { ",".join(keys)} FROM {table_name}'
         if value != "":
             cmd += f" WHERE {key}"
             
@@ -139,11 +146,12 @@ def update(table_name, col, dict):
     with connect('database.db') as con:
         cur = con.cursor()
         cmds = [
-            f"update {table_name} set {col} = 'temp' where {col} = '{x}';", 
+            #f"update {table_name} set {col} = 'temp' where {col} = '{x}';", 
             f"update {table_name} set {col} = '{x}'  where {col} = '{y}';",
-            f"update {table_name} set {col} = '{y}' where {col} = 'temp';",
+            #f"update {table_name} set {col} = '{y}' where {col} = 'temp';",
         ]
         for cmd in cmds:
+            print(cmd)
             cur.execute(cmd) 
         con.commit() 
 
