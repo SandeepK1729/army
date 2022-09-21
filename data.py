@@ -40,7 +40,7 @@ repair_state = {
         "NOMENCLATURE",	
         "QTY USED", 
         "DATE OUT", 
-        "REMARKS",
+"REMARKS",
     ], 
     'search_column' : 0,
 }
@@ -88,26 +88,34 @@ recurring_fault_db = {
     ], 
     'search_column' : 0,
 }
-avr_lr = {
+dets = {
     'columns' : [
+        "DET NAME",
+        'DET TYPE',
+        'VEHICLE TYPE',
+        'LANGITUDE', 
+        'LATITUDE',
         "ARMY NO", 
         "DATE",
         "RANK", 
         "NAME", 
-        "TRADE", 
-        "MOB NO", 
+        "TRADE",
+        "MOB NO",
         "REMARKS",
     ], 
-    'search_column' : 0,
+    'search_column' : 2,
+    #'primary_key' : 1,
 }
 spares = {
     'columns' : [
+        'DET NAME',
         'NAME OF SPARE', 
         'SECTION NO', 
         'CAT PART NO', 
         'QTY', 
     ], 
-    'search_column' : 2,
+    'search_column' : 3,
+    'primary_key' : 3,
 }
 tables = { 
     "battle_board" : battle_board_table, 
@@ -116,6 +124,30 @@ tables = {
     "rec_state" : rec_state, 
     "vor_eoa_state" : vor_eoa_state, 
     "recurring_fault_db" : recurring_fault_db,
-    "avt_lr" : avr_lr,
+    "dets" : dets,
     'spares' : spares,
 }
+type = { 
+    "REC VEH" : 'number', 
+    "SER" : 'number',
+    "UNIT" : 'number', 
+    'DET TYPE' : 'select',
+    'SER NO' : 'text',
+    'QTY' : 'number',
+    'CAT PART NO' : 'text',
+}
+def get_type(name, production = False):
+    
+    Opts = {'select' : 'text', 'number' : 'integer'}
+    
+    if name not in type:
+        if "DATE" in name:
+            return "date"
+    
+        if "NO" in name:
+            return "integer" if production else "number"
+
+        return "text"
+
+    c_type = type[name]
+    return Opts[c_type] if production and c_type in Opts else c_type

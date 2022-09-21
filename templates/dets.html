@@ -12,13 +12,7 @@
 
     <div class="container">
         <form>
-            <input 
-                type="search" 
-                name="search" 
-                id="search" 
-                class="input-text"
-                value = "{% if search_key %}{{search_key}}{% endif %}"
-            >
+            <input type="search" name="search" id="search" class="input-text" value = "{% if search_key %}{{search_key}}{% endif %}">
             <input type="submit" value="Search" class="btn btn-secondary">
             <hr>
         </form>
@@ -28,6 +22,7 @@
                     {% for header in headers %}
                         <th scope="col"> {{ header[0] }} </th>
                     {% endfor %}
+                    <th scope="col">VIEW</th>
                     <th scope="col">REMOVE</th>
                 </tr>
             </thead>
@@ -38,20 +33,32 @@
                             <td class="table-data text-center">{{ row[i] }}</td>
                         {% endfor %}
         
-                        <td class="m-0"><form method="post" action="{{ request.path }}/delete">
-                            <input type="hidden" name="DELETE" value="{{ row[0] }}">
-                            <input type="submit" value="REMOVE" class="btn btn-secondary rounded">
-                        </form></td>
+                        <td class="m-0"><a href="/dets/{{ row[-1] }}" class="btn btn-primary">VIEW</a></td>
+                        <td class="m-0">
+                            <form method="post" action="{{ request.path }}/delete">
+                                <input type="hidden" name="DELETE" value="{{ row[0] }}">
+                                <input type="submit" value="REMOVE" class="btn btn-secondary rounded">
+                            </form>
+                        </td>
                     </tr>
                 {% endfor %}
                 <form method = "POST">
                     <tr scope="row">
                         <div >
-                                {% for rec in headers %}
-                                    <td class="table-data" >
-                                        <input type="{{ rec[1] }}" name="{{ rec[0] }}" id="{{ rec[0] }}" class="m-0 w-100" required>
-                                    </td>
-                                {% endfor %}
+                            {% for i in range(headers|length) %}
+                                <td class="table-data" >
+                                    {% if headers[i][1] == "select" %}
+                                        <select name="{{ headers[i][0] }}" id="{{ headers[i][0] }}">
+                                            {% for type in det_types %}
+                                                <option value="{{ type }}">{{ type }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                        <input type="{{ headers[i][1] }}" name="{{ headers[i][0] }}" id="{{ headers[i][0] }}" class="m-0 w-100" required>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                                    
                                 <td><input type="submit" value="Add" class="btn btn-primary m-0"></td>
                         
                         </div>

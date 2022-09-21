@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, send_file, session, redirect
 from lib import *
 from flask_session import Session  
-from data import tables 
+from data import get_type, tables 
 from functools import wraps
 
 app = Flask(__name__)
@@ -43,10 +43,164 @@ def login_required(func):
 
     return m_func 
 
-@app.route('/avt_lr')
-@app.route('/avt_fr')
-@app.route('/mrt')
-def conncec():
+@app.route("/")
+@login_required
+def home():
+    return render_template("home.html")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/dets', methods = ("GET", "POST"))
+@login_required
+def dets(name = "dets"):
+    headers = tables[name]['columns']
+    
+    print(request.form)
+    if request.method == "POST":
+        add(table_name = name, keys = headers, dict = request.form)
+        
+    data = load(
+        table_name = name,
+        keys = headers,
+        value = request.args.get('search', '')
+    )
+    
+    return render_template(
+        "dets.html",
+        table = data, 
+        det_types = ['AVT LR', 'AVT FR', 'MRT'],
+        headers = [(name, get_type(name)) for name in headers], 
+        title = " ".join(name.split("_")).upper(), 
+        name = name,
+        search_key = request.args.get("search", "")
+    )
+
+#@app.route('/dets/<id>')
+@app.route('/spares', methods = ("GET", "POST"))
+@login_required
+def spares():
+    name = list(request.path.split('/'))[-1]
+    headers = tables[name]['columns'][1:]
+    print(headers)
+
+    if request.method == "POST":
+        if "ADD" in request.form:
+            add(table_name = name, keys = headers, dict = request.form)
+        if "SADD" in request.form:
+            add(table_name = name, keys = tables[name]['columns'], dict = request.form)
+        
+        if "UPDATE_SPARE_DATA" in request.form:
+            special_update(name, request.form)
+        if "DELETE" in request.form:
+            remove(
+                name, 
+                (request.form['CAT PART NO'], request.form['DET NAME']),
+                (3, 0)
+            )
+    data = special_load(
+        table_name = name,
+        keys = headers,
+        value = request.args.get('search', '')
+    )
+
+    print(request.form)
+    if request.method == "POST" and "show_spare" in request.form:
+        name_of_spare = request.form.get("NAME OF SPARE")
+        cat_part_no = request.form.get("CAT PART NO")
+        section_no = request.form.get("SECTION NO")
+
+        headers2 = ["DET NAME", "QTY"]
+        data2 = load(
+            table_name = name, 
+            keys = headers2,
+            value = cat_part_no
+        )
+        return render_template(
+            "spares.html",
+            table = data, 
+            headers = [(name, get_type(name)) for name in headers],
+
+            table2 = data2,
+            headers2 = [(name, get_type(name)) for name in headers2], 
+            name_of_spare = name_of_spare,
+            cat_part_no = cat_part_no,
+            section_no = section_no,
+
+            title = " ".join(name.split("_")).upper(), 
+            name = name,
+            update_form = (name == "spares"),
+            search_key = request.args.get("search", "")
+        )
+    
+    return render_template(
+        "spares.html",
+        table = data, 
+        headers = [(name, get_type(name)) for name in headers], 
+        title = " ".join(name.split("_")).upper(), 
+        name = name,
+        update_form = (name == "spares"),
+        search_key = request.args.get("search", "")
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/battle_board", methods = ("GET", "POST"))
+@app.route("/record_of_work", methods = ("GET", "POST"))
+@app.route("/repair_state", methods = ("GET", "POST"))
+@app.route("/rec_state", methods = ("GET", "POST"))
+@app.route("/vor_eoa_state", methods = ("GET", "POST"))
+@app.route("/recurring_fault_db", methods = ("GET", "POST"))
+@login_required
+def tables_db():
     name = list(request.path.split('/'))[-1]
     headers = tables[name]['columns']
 
@@ -55,41 +209,18 @@ def conncec():
 
     data = load(
         table_name = name,
+        keys = headers,
         value = request.args.get('search', '')
     )
+    
     return render_template(
         "table.html",
         table = data, 
-        headers = headers, 
+        headers = [(name, get_type(name)) for name in headers], 
         title = " ".join(name.split("_")).upper(), 
         name = name,
-        update_form = (name == "spares")
-    )
-
-@app.route("/")
-@login_required
-def home():
-    return render_template("home.html")
-
-@app.route("/<name>", methods = ("POST", "GET"))
-@login_required
-def tables_db(name):
-    headers = tables[name]['columns']
-
-    if request.method == "POST":
-        add(table_name = name, keys = headers, dict = request.form)
-
-    data = load(
-        table_name = name,
-        value = request.args.get('search', '')
-    )
-    return render_template(
-        "table.html",
-        table = data, 
-        headers = headers, 
-        title = " ".join(name.split("_")).upper(), 
-        name = name,
-        update_form = (name == "spares")
+        update_form = (name == "spares"),
+        search_key = request.args.get("search", "")
     )
 
 @app.route('/<name>/delete', methods = ("POST", "GET"))
@@ -112,7 +243,11 @@ def cat_pat(name = "spares"):
     headers = tables[name]['columns']
 
     if request.method == "POST":
-        update(table_name = name, col = 'CAT PART NO', dict = request.form)
+        update(
+            table_name = name, 
+            col = 'CAT PART NO', 
+            dict = request.form
+        )
     return redirect(f'/{name}')
 
 @app.route("/download/<name>")
@@ -122,8 +257,7 @@ def download_file(name):
         return redirect("/")
 
     path = 'static/files/csv/download.csv'
-    csv_generate(name)
-
+    
     return send_file(
         path, 
         as_attachment = True, 
@@ -137,7 +271,6 @@ def print_file(name):
     if name not in tables:
         return redirect("/")
     
-    csv_generate(name)
     path = 'static/files/pdf/download.pdf'
     pdf_generate()
 

@@ -1,62 +1,128 @@
 from sqlite3 import connect
-from data import tables
+from data import get_type, tables
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import pypandoc 
+import pandasql as ps
 
-def add(table_name, keys, dict):
+def cast_type(key, value):
+    return value if get_type(key) == "number" else f"'{value}'"
+    
+def add(table_name, keys, dict):    
     """
         def add(table_name, keys, dict):
     """
-    data = [
-        str(dict[key]) for key in keys
-    ]
-    print(data)
+
     with connect('database.db') as con:
         cur = con.cursor()
         try:
-            cmd = f"""INSERT INTO {table_name} VALUES({",".join([
-                f"'{value}'" for value in data])});"""
+            cmd = f"""
+            
+                INSERT INTO {table_name}({",".join([chr(65 + tables[table_name]['columns'].index(key)) for key in keys])}) 
+                VALUES({",".join([f"{cast_type(key, dict[key])}" for key in keys])});
+                
+                """
             print(cmd)
-            cur.execute(cmd)
+            print(cur.execute(cmd))
             con.commit()
         except:
             return f"{keys[0]} must be unique"
 
-def load(table_name, value = ""):
+def special_update(table_name, dict):
+    table = tables[table_name]
+    cols = table['columns']
+    prime_col = table.get('primary_key', 0)
+    
+    print(dict)
+    data = []
+    for i in range(len(cols)):
+        if cols[i] in dict and i != prime_col:
+            data.append((chr(i + 65), cast_type(cols[i], dict[cols[i]])))
+    print(data)
+    prime_key, prime_value = (chr(65 + prime_col), cast_type(cols[prime_col], dict[cols[prime_col]]))
+
+    with connect('database.db') as con:
+        cur = con.cursor()
+        try:
+            cmd = f"""
+                UPDATE {table_name} 
+                SET {", ".join([f"{key} = {value}" for key, value in data])}
+                WHERE {prime_key} = {prime_value};
+            """
+            print(cmd)
+            print(cur.execute(cmd))
+            con.commit()
+        except:
+            return "null"
+
+def load(table_name, keys = "", value = ""):
     """
         def load(table_name, key, value):
     """
-    key = chr(tables[table_name]['search_column'] + 65)
+    table = tables[table_name]
+    key = chr(table['search_column'] + 65)
+    keys = [chr(65 + table['columns'].index(key)) for key in keys]
+    key_name = table['columns'][table['search_column']]
 
     with connect('database.db') as con:
-        cur = con.cursor()
         cmd = f"SELECT * FROM {table_name}" 
         if value != "":
-            cmd += f" WHERE {key} LIKE '%{value}%'"
+            cmd += f" WHERE {key}"
+            
+            if get_type(key_name) == "number":
+                cmd += f" = {cast_type(key_name, value)[0]}"
+            else :
+                cmd += f" LIKE '%{value}%'"
+            
+        cmd += ';'
         print(cmd)
-        cur.execute(cmd + ';')
         
-        return cur.fetchall()
+        path = 'static/files/csv/download.csv'
+        df = pd.DataFrame(pd.read_sql_query(cmd, con), columns=keys)
+        print(keys)
+        df.to_csv(path)
+    
+        return df.values.tolist()
 
-def remove(table_name, value, key = 'A'):
+def special_load(table_name, keys = "", value = ""):
+    """
+        def load(table_name, key, value):
+    """
+    table = tables[table_name]
+    key = chr(table['search_column'] + 65)
+    keys = [chr(65 + table['columns'].index(key)) for key in keys]
+    
+    with connect('database.db') as con:
+        cur = con.cursor()
+        cmd = f"SELECT B,C,D,SUM(E) AS E FROM {table_name}" 
+        if value != "":
+            cmd += f" WHERE {key} LIKE '%{value}%'"
+        cmd += ' GROUP BY B;'
+        print(cmd)
+        
+        path = 'static/files/csv/download.csv'
+        df = pd.DataFrame(pd.read_sql_query(cmd, con), columns=keys)
+        df.to_csv(path)
+    
+        return df.values.tolist()
+
+def remove(table_name, values, keys = -1):
     """
         def remove(table_name, key, value):
     """
+    table = tables[table_name]
+    cols = table['columns']
+
+    idxs = table.get('primary_key', 0) if keys == -1 else keys
+    
     with connect('database.db') as con:
         cur = con.cursor()
-        cmd = f"""DELETE FROM {table_name} WHERE {key} = '{value}';"""
+        cmd = f"""DELETE FROM {table_name} WHERE 
+            {" AND ".join(f"{chr(idx + 65)} = {cast_type(cols[idx], value)}" for idx, value in zip(idxs, values))};"""
         print(cmd)
         cur.execute(cmd)
         con.commit()
-
-def csv_generate(name):
-    path = 'static/files/csv/download.csv'
-    keys = tables[name]['columns']
-    data = load(table_name = name)
-    df = pd.DataFrame(data, columns = keys)
-    df.to_csv(path)
 
 def update(table_name, col, dict):
     x = dict['v1']
