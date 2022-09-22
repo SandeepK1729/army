@@ -16,6 +16,7 @@
                 <tr scope="row" class="table-data">
                     <form method="post">
                         <div>
+                            <input type="hidden" name="show_spare" value="{{ row[0] }}">
                             <input type="hidden" name="UPDATE_SPARE_DATA" value="{{ row[0] }}">
                             <input type="hidden" name="NAME OF SPARE" value="{{ name_of_spare }}">
                             <input type="hidden" name="CAT PART NO" value="{{ cat_part_no }}">
@@ -39,27 +40,62 @@
                             <input type="submit" value="REMOVE" class="btn btn-secondary rounded">
                         </form>
                     </td>
+                    <form method="post">
+                        <div>
+                            
+                            <input type="hidden" name="show_spare" value="{{ row[0] }}">
+                            <input type="hidden" name="TRANSFER">
+                            <input type="hidden" name="NAME OF SPARE" value="{{ name_of_spare }}">
+                            <input type="hidden" name="CAT PART NO" value="{{ cat_part_no }}">
+                            <input type="hidden" name="SECTION NO" value="{{ section_no }}">
+                            {% for i in range(row|length) %}
+                                <input name="{{ headers2[i][0] }}" type="hidden"value="{{ row[i] }}">
+                            {% endfor %}
+                            <td class="table-data" >
+                                <select name="TRANSFER {{ headers2[0][0] }}" id="TRANSFER {{ headers2[0][0] }}">
+                                    <option value="Select Det Name" selected  disabled>Select Det Name</option>
+                                    {% for type in choices[headers2[0][0]] %}
+                                        <option value="{{ type }}">{{ type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="table-data" >
+                                <input type="{{ headers2[1][1] }}" name="TRANSFER {{ headers2[1][0] }}" id="TRANSFER {{ headers2[1][0] }}" class="m-0 w-100" required>
+                            </td>
+                            <td><input type="submit" value="TRANSFER" class="btn btn-secondary"></td>
+                        </div>
+                    </form>
+                    
                 </tr>
             
             {% endfor %}
-            <form method = "POST">
-                <tr scope="row">
+            <tr scope="row">
+                <form method = "POST">
                     <div>
+                        <input type="hidden" name="show_spare" value="">
                         <input type="hidden" name="SADD" value="hello">
                         <input type="hidden" name="NAME OF SPARE" value="{{ name_of_spare }}">
                         <input type="hidden" name="CAT PART NO" value="{{ cat_part_no }}">
                         <input type="hidden" name="SECTION NO" value="{{ section_no }}">
 
-                        {% for rec in headers2 %}
-                            <td class="table-data" >
-                                <input type="{{ rec[1] }}" name="{{ rec[0] }}" id="{{ rec[0] }}" class="m-0 w-100" required>
-                            </td>
-                        {% endfor %}
+                        <td class="table-data" >
+                            <select name="{{ headers2[0][0] }}" id="{{ headers2[0][0] }}">
+                                <option value="Select Det Name" selected  disabled>Select Det Name</option>
+                                {% for type in choices[headers2[0][0]] %}
+                                    <option value="{{ type }}">{{ type }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="table-data" >
+                            <input type="{{ headers2[1][1] }}" name="{{ headers2[1][0] }}" id="{{ headers2[1][0] }}" class="m-0 w-100" required>
+                        </td>
+                        
                         <td><input type="submit" value="Add" class="btn btn-primary m-0"></td>
-                    
                     </div>
-                </tr> 
-            </form>
+                </form>
+                        
+                
+            </tr> 
         </tbody>
     </table>    
 </div>

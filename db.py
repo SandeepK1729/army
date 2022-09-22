@@ -17,7 +17,7 @@ with connect("database.db") as con:
             {chr(65 + prime_key) if re else "ZZZ INTEGER"} NOT NULL PRIMARY KEY {"AUTOINCREMENT" if not re else ""},
             {",".join([chr(65 + i) + " " + get_type(table['columns'][i], True)  for i in keys])}
         );"""
-        print(cmd)
+        
         cur.execute(cmd)
         print("OK")
         

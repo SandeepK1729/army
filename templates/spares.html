@@ -56,9 +56,17 @@
                         <div >
                             {% for rec in headers %}
                                 <td class="table-data" >
-                                    <input type="{{ rec[1] }}" name="{{ rec[0] }}" id="{{ rec[0] }}" class="m-0 w-100" required>
+                                    <input type="{{ rec[1] }}" name="{{ rec[0] }}" placeholder="{{ rec[0] }}" id="{{ rec[0] }}" class="m-0 w-100" required>
                                 </td>
                             {% endfor %}
+                            <td>
+                                <select name="DET NAME" id="DET NAME">
+                                    <option value="Select Det Name" selected disabled>Select Det Name</option>
+                                    {% for type in choices['DET NAME'] %}
+                                        <option value="{{ type }}">{{ type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
                             <td><input type="submit" value="Add" class="btn btn-primary m-0"></td>
                         
                         </div>
@@ -75,9 +83,7 @@
             {% include 'spare_manage.html' %}
         {% endif %}
 
-        {% if update_form %}
-            {% include 'update_form.html' %}
-        {% endif %}
+        
     </div>
 
 {% endblock %}

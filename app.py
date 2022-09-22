@@ -106,21 +106,29 @@ def dets(name = "dets"):
 def spares():
     name = list(request.path.split('/'))[-1]
     headers = tables[name]['columns'][1:]
-    
+    headers_all = headers + ['DET NAME']
+    all_dets()
+
     if request.method == "POST":
         if "ADD" in request.form:
-            add(table_name = name, keys = headers, dict = request.form)
+            add(table_name = name, keys = headers_all, dict = request.form)
+            print("adding ...")
         if "SADD" in request.form:
             add(table_name = name, keys = tables[name]['columns'], dict = request.form)
-        
+            print("Spare Adding ...")
         if "UPDATE_SPARE_DATA" in request.form:
             special_update(name, request.form, primes = ('CAT PART NO', 'DET NAME'))
+            print("updating spares ...")
         if "DELETE" in request.form:
             remove(
                 name, 
                 (request.form['CAT PART NO'], request.form['DET NAME']),
                 (3, 0)
             )
+            print("delete spares ...")
+        if "TRANSFER" in request.form:
+            transfer(table_name = name, dict = request.form)
+            print("transfer spares ..")
     data = special_load(
         table_name = name,
         keys = headers,
@@ -143,7 +151,9 @@ def spares():
             "spares.html",
             table = data, 
             headers = [(name, get_type(name)) for name in headers],
-
+            headers_all = [(name, get_type(name)) for name in headers_all],
+            choices = choices, 
+            
             table2 = data2,
             headers2 = [(name, get_type(name)) for name in headers2], 
             name_of_spare = name_of_spare,
@@ -160,21 +170,13 @@ def spares():
         "spares.html",
         table = data, 
         headers = [(name, get_type(name)) for name in headers], 
+        choices = choices, 
+        headers_all = [(name, get_type(name)) for name in headers_all],
         title = " ".join(name.split("_")).upper(), 
         name = name,
         update_form = (name == "spares"),
         search_key = request.args.get("search", "")
     )
-
-
-
-
-
-
-
-
-
-
 
 
 

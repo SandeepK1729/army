@@ -1,5 +1,5 @@
 from sqlite3 import connect
-from data import get_type, tables
+from data import get_type, tables,choices
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -23,40 +23,32 @@ def add(table_name, keys, dict):
                 VALUES({",".join([f"{cast_type(key, dict[key])}" for key in keys])});
                 
                 """
-            print(cmd)
-            print(cur.execute(cmd))
+            cur.execute(cmd)
             con.commit()
         except:
             return f"{keys[0]} must be unique"
 
 def special_update(table_name, dict, primes = -1):
     table = tables[table_name]
-    cols = table['columns']
-    primes = [table['columns'][table.get('primary_key', 0)]] if primes == -1 else primes
-    
-    data = []
-    for i in range(len(cols)):
-        if cols[i] in dict:
-            data.append(f"{chr(i + 65)} = {cast_type(cols[i], dict[cols[i]])}")
-    print(dict)
-    
     with connect('database.db') as con:
         cur = con.cursor()
         try:
             cmd = f"""
                     SELECT ZZZ from {table_name} 
-                    WHERE A {f"= '{dict['UPDATE_SPARE_DATA']}'" if dict['UPDATE_SPARE_DATA'] != 'None' else "IS NULL"}
+                    WHERE A = '{dict['UPDATE_SPARE_DATA']}'
                     AND
                     D = '{dict['CAT PART NO']}';
                 """
             cur.execute(cmd)
             
-            e = cur.fetchone()
+            e = cur.fetchone()[0]
+            
             cmd  = f"""
                     UPDATE {table_name} 
-                    SET {", ".join(data)}
-                    WHERE ZZZ = {e[0]};
+                    SET A = '{dict['DET NAME']}', E = {dict["QTY"]}
+                    WHERE ZZZ = {e};
                 """
+            cur.execute(cmd)
             
             con.commit()
         except Exception as e:
@@ -83,11 +75,10 @@ def load(table_name, keys = "", value = ""):
                 cmd += f" LIKE '%{value}%'"
             
         cmd += ';'
-        print(cmd)
         
         path = 'static/files/csv/download.csv'
         df = pd.DataFrame(pd.read_sql_query(cmd, con), columns=keys)
-        print(keys)
+        
         df.to_csv(path)
     
         return df.values.tolist()
@@ -106,7 +97,6 @@ def special_load(table_name, keys = "", value = ""):
         if value != "":
             cmd += f" WHERE {key} LIKE '%{value}%'"
         cmd += ' GROUP BY B;'
-        print(cmd)
         
         path = 'static/files/csv/download.csv'
         df = pd.DataFrame(pd.read_sql_query(cmd, con), columns=keys)
@@ -151,7 +141,7 @@ def update(table_name, col, dict):
             #f"update {table_name} set {col} = '{y}' where {col} = 'temp';",
         ]
         for cmd in cmds:
-            print(cmd)
+            
             cur.execute(cmd) 
         con.commit() 
 
@@ -171,3 +161,85 @@ def pdf_generate():
 
     output = pypandoc.convert_file(root, 'pdf', outputfile=path)
     assert output == ""
+
+def transfer(table_name, dict):
+    transfer_qty = int(dict['TRANSFER QTY'])
+    keys = tables[table_name]['columns']
+    with connect('database.db') as con:
+        cur = con.cursor()
+    
+        # extracting primary key
+        cmd = f"""
+                SELECT E, ZZZ from Spares 
+                WHERE A = '{dict['DET NAME']}'
+                AND
+                D = '{dict['CAT PART NO']}';
+            """
+        cur.execute(cmd)
+        print(cmd)
+
+        previous_qty, e = cur.fetchone()
+        print(f" p qu : {previous_qty}, {e}")
+        # reducing from previous
+        cmd  = f"""
+                    UPDATE {table_name} 
+                    SET E = {previous_qty - transfer_qty}
+                    WHERE ZZZ = {e};
+                """
+        con.commit()
+        print(cmd)
+        cur.execute(cmd)
+        # adding for new det 
+        cmd = f"""
+            SELECT E, ZZZ from spares
+            WHERE A = '{dict["TRANSFER DET NAME"]}'
+            AND
+            D = '{dict['CAT PART NO']}';
+        """
+        print(cmd)
+        cur.execute(cmd)
+
+        x = cur.fetchone()
+        print(x)
+        
+        re = {}
+        re['QTY'] = transfer_qty
+        re["DET NAME"] = dict["TRANSFER DET NAME"]
+        re['CAT PART NO'] = dict['CAT PART NO']
+        re['SECTION NO'] = dict['SECTION NO']
+        re['NAME OF SPARE'] = dict['NAME OF SPARE']
+
+        if x is None:
+            print(re)
+            
+            cmd = f"""
+            
+                INSERT INTO {table_name}({",".join([chr(65 + tables[table_name]['columns'].index(key)) for key in keys])}) 
+                VALUES({",".join([f"{cast_type(key, re[key])}" for key in keys])});
+                
+                """
+            cur.execute(cmd)
+            
+        else:
+            new_qty, e = x
+            cmd  = f"""
+                    UPDATE {table_name} 
+                    SET E = {new_qty + transfer_qty}
+                    WHERE ZZZ = {e};
+                """
+            cur.execute(cmd)
+            print(cmd)
+        con.commit()
+    
+def all_dets():
+    with connect('database.db') as con:
+        cur = con.cursor()
+        try:
+            cmd = f"""
+                SELECT DISTINCT A FROM dets;
+                """
+            cur.execute(cmd)
+            x = [i for i, *j in cur.fetchall()]
+            choices['DET NAME'] = x
+        except:
+            pass
