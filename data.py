@@ -128,15 +128,23 @@ tables = {
     'spares' : spares,
 }
 type = { 
+    'DET TYPE' : 'select',
+    'SYSTEM' : 'select',
+    
     "REC VEH" : 'number', 
     "SER" : 'number',
     "UNIT" : 'number', 
-    'DET TYPE' : 'select',
-    'SYSTEM' : 'select',
-    'SER NO' : 'text',
+    "QTY USED" : 'number', 
+    'SER NO' : 'number',
     'QTY' : 'number',
+    "NO & TYPE OF REC VEHS USED" : 'number', 
+    "S NO" : 'number', 
+    "NO OF INCIDENCE" : 'number',
+
     'CAT PART NO' : 'text',
     'SECTION NO' : 'text',
+    'REGN NO' : 'text',
+
 }
 choices = {
     'DET TYPE' : ['AVT LR', 'AVT FR', 'MRT', 'MRCT', 'AWD'],
@@ -151,9 +159,6 @@ def get_type(name, production = False):
         if "DATE" in name:
             return "date"
     
-        if "NO" in name:
-            return "integer" if production else "number"
-
         return "text"
 
     c_type = type[name]
