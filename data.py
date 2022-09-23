@@ -93,7 +93,7 @@ dets = {
         "DET NAME",
         'DET TYPE',
         'VEHICLE TYPE',
-        'LANGITUDE', 
+        'LONGITUDE', 
         'LATITUDE',
         "ARMY NO", 
         "DATE",
