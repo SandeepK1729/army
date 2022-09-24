@@ -1,3 +1,6 @@
+from string import ascii_lowercase, ascii_uppercase
+alphabet = ascii_lowercase + ascii_uppercase
+
 battle_board_table = {
     'columns' : [
         "SER", 
@@ -163,3 +166,8 @@ def get_type(name, production = False):
 
     c_type = type[name]
     return Opts[c_type] if production and c_type in Opts else c_type
+
+def getFieldName(s):
+    s = s.replace(" ", "_")
+    return "".join([c if c in alphabet else "" for c in s])
+    

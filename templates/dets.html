@@ -19,8 +19,8 @@
         <table class="table table-striped table-bordered table-hover">
             <thead>
                 <tr>
-                    {% for header in headers %}
-                        <th scope="col"> {{ header[0] }} </th>
+                    {% for i in range(1, headers|length) %}
+                        <th scope="col"> {{ headers[i][0] }} </th>
                     {% endfor %}
                     <th scope="col">VIEW</th>
                     <th scope="col">REMOVE</th>
@@ -29,13 +29,13 @@
             <tbody class="table-group-divider">
                 {% for row in table %}
                     <tr scope="row" class="table-data">
-                        {% for i in range(row|length) %}
+                        {% for i in range(1, row|length) %}
                             <td class="table-data text-center">{{ row[i] }}</td>
                         {% endfor %}
         
-                        <td class="m-0"><a href="/dets/{{ row[-1] }}" class="btn btn-primary">VIEW</a></td>
+                        <td class="m-0"><a href="/dets/{{ row[0] }}" class="btn btn-primary">VIEW</a></td>
                         <td class="m-0">
-                            <form method="post" action="{{ request.path }}/delete">
+                            <form method="post">
                                 <input type="hidden" name="DELETE" value="{{ row[0] }}">
                                 <input type="submit" value="REMOVE" class="btn btn-secondary rounded">
                             </form>
@@ -45,7 +45,8 @@
                 <form method = "POST">
                     <tr scope="row">
                         <div >
-                            {% for i in range(headers|length) %}
+                            <input type="hidden" name="ADD" value="">
+                            {% for i in range(1, headers|length) %}
                                 <td class="table-data" >
                                     {% if headers[i][1] == "select" %}
                                         <select name="{{ headers[i][0] }}" id="{{ headers[i][0] }}">

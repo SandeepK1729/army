@@ -65,7 +65,7 @@ def load(table_name, keys = "", value = ""):
     key_name = table['columns'][table['search_column']]
 
     with connect('database.db') as con:
-        cmd = f'SELECT { ",".join(keys)} FROM {table_name}'
+        cmd = f'SELECT ZZZ,{ ",".join(keys)} FROM {table_name}'
         if value != "":
             cmd += f" WHERE {key}"
             
@@ -75,13 +75,15 @@ def load(table_name, keys = "", value = ""):
                 cmd += f" LIKE '%{value}%'"
             
         cmd += ';'
+        print(cmd)
         
         path = 'static/files/csv/download.csv'
         df = pd.DataFrame(pd.read_sql_query(cmd, con), columns=keys)
         
         df.to_csv(path)
-    
-        return df.values.tolist()
+        cur = con.cursor()
+        cur.execute(cmd)
+        return cur.fetchall()
 
 def special_load(table_name, keys = "", value = ""):
     """
@@ -104,26 +106,13 @@ def special_load(table_name, keys = "", value = ""):
     
         return df.values.tolist()
 
-def remove(table_name, values, keys = -1):
+def remove(table_name, prime_key):
     """
         def remove(table_name, key, value):
     """
-    table = tables[table_name]
-    cols = table['columns']
-
-    idxs = table.get('primary_key', 0) if keys == -1 else keys
-    
     with connect('database.db') as con:
         cur = con.cursor()
-        cmd = f"DELETE FROM {table_name} WHERE "
-            
-        if "list" in str(type(values)) or "tuple" in str(type(values)):
-            cmd += " AND ".join(f"{chr(idx + 65)} = {cast_type(cols[idx], value)}" for idx, value in zip(idxs, values))
-        else:
-            cmd += f"{chr(65 + idxs)} = {cast_type(cols[idxs], values)}"
-        
-        cmd += ';'
-
+        cmd = f"DELETE FROM {table_name} WHERE ZZZ={prime_key};"
         print(cmd)
         cur.execute(cmd)
         con.commit()

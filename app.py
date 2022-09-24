@@ -75,14 +75,19 @@ def home():
 
 
 
-@app.route('/dets', methods = ("GET", "POST"))
+@app.route('/dets', methods = ["PUT", "GET", "POST"])
 @login_required
 def dets(name = "dets"):
     headers = tables[name]['columns']
     
-    print(request.form)
     if request.method == "POST":
-        add(table_name = name, keys = headers, dict = request.form)
+        if "ADD" in request.form:
+            add(table_name = name, keys = headers, dict = request.form)
+        if "DELETE" in request.form:
+            remove(
+                table_name = name, 
+                prime_key = request.form.get("DELETE", -1)
+            )
         
     data = load(
         table_name = name,
@@ -94,14 +99,14 @@ def dets(name = "dets"):
         "dets.html",
         table = data, 
         choices = choices,
-        headers = [(name, get_type(name)) for name in headers], 
+        headers = ["ZZZ"] + [(name, get_type(name)) for name in headers], 
         title = " ".join(name.split("_")).upper(), 
         name = name,
         search_key = request.args.get("search", "")
     )
 
 #@app.route('/dets/<id>')
-@app.route('/spares', methods = ("GET", "POST"))
+@app.route('/spares', methods = ["PUT", "GET", "POST"])
 @login_required
 def spares():
     name = list(request.path.split('/'))[-1]
@@ -195,30 +200,38 @@ def spares():
 
 
 
-@app.route("/battle_board", methods = ("GET", "POST"))
-@app.route("/record_of_work", methods = ("GET", "POST"))
-@app.route("/repair_state", methods = ("GET", "POST"))
-@app.route("/rec_state", methods = ("GET", "POST"))
-@app.route("/vor_eoa_state", methods = ("GET", "POST"))
-@app.route("/recurring_fault_db", methods = ("GET", "POST"))
+@app.route("/battle_board", methods = ["PUT", "GET", "POST"])
+@app.route("/record_of_work", methods = ["PUT", "GET", "POST"])
+@app.route("/repair_state", methods = ["PUT", "GET", "POST"])
+@app.route("/rec_state", methods = ["PUT", "GET", "POST"])
+@app.route("/vor_eoa_state", methods = ["PUT", "GET", "POST"])
+@app.route("/recurring_fault_db", methods = ["PUT", "GET", "POST"])
 @login_required
 def tables_db():
     name = list(request.path.split('/'))[-1]
     headers = tables[name]['columns']
-
+    
     if request.method == "POST":
-        add(table_name = name, keys = headers, dict = request.form)
-
+        if "ADD" in request.form:
+            add(table_name = name, keys = headers, dict = request.form)
+        if "DELETE" in request.form:
+            remove(
+                table_name = name, 
+                prime_key = request.form.get("DELETE", -1)
+            )
+    
+    
     data = load(
         table_name = name,
         keys = headers,
         value = request.args.get('search', '')
     )
+    print(data)
     
     return render_template(
         "table.html",
         table = data, 
-        headers = [(name, get_type(name)) for name in headers], 
+        headers = ["ZZZ"] + [(name, get_type(name)) for name in headers], 
         title = " ".join(name.split("_")).upper(), 
         name = name,
         choices = choices,
