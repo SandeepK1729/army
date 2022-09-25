@@ -48,32 +48,6 @@ def login_required(func):
 def home():
     return render_template("home.html")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/dets', methods = ["PUT", "GET", "POST"])
 @login_required
 def dets(name = "dets"):
@@ -215,23 +189,6 @@ def spares():
         name = name,
         search_key = request.args.get("search", "")
     )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @app.route("/battle_board", methods = ["PUT", "GET", "POST"])
 @app.route("/record_of_work", methods = ["PUT", "GET", "POST"])
