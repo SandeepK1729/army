@@ -28,23 +28,23 @@
                 {% for row in table %}
                     <tr scope="row" class="table-data">
                         <form method="post">
-                            {% for i in range(row|length) %}
+                            <input type="hidden" name="ZZZ" value="{{ row[0] }}">
+                            {% for i in range(1, row|length) %}
                                 <td class="table-data text-center">{{ row[i] }}</td>
-                                <input name="{{ headers[i][0] }}" type="hidden" value="{{ row[i] }}">
-                                
+                                <input type="hidden" name="{{ headers[i - 1][0] }}" value="{{ row[i] }}">
                             {% endfor %}
             
                             
                             <td class="m-0">
                                 <input type="hidden" name="show_spare" value="{{ row[2] }}">
                                 <input type="submit" value="VIEW" class="btn btn-secondary rounded">
-                            
                             </td>
                         </form>
                         
                         <td class="m-0">
-                            <form method="post" action="{{ request.path }}/delete">
-                                <input type="hidden" name="DELETE" value="{{ row[2] }}">
+                            <form method="post">
+                                <input type="hidden" name="DELETE" value="{{ row[3] }}">
+                                <input type="hidden" name="NON_PRIME_DELETE" value="h">
                                 <input type="submit" value="REMOVE" class="btn btn-secondary rounded">
                             </form>
                         </td>
@@ -68,7 +68,6 @@
                                 </select>
                             </td>
                             <td><input type="submit" value="Add" class="btn btn-primary m-0"></td>
-                        
                         </div>
                     </tr> 
                 </form>

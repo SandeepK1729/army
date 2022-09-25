@@ -16,61 +16,47 @@ def add(table_name, keys, dict):
 
     with connect('database.db') as con:
         cur = con.cursor()
-        try:
-            cmd = f"""
+        cmd = f"""
+        
+            INSERT INTO {table_name}({",".join([chr(65 + tables[table_name]['columns'].index(key)) for key in keys])}) 
+            VALUES({",".join([f"{cast_type(key, dict[key])}" for key in keys])});
             
-                INSERT INTO {table_name}({",".join([chr(65 + tables[table_name]['columns'].index(key)) for key in keys])}) 
-                VALUES({",".join([f"{cast_type(key, dict[key])}" for key in keys])});
-                
-                """
-            cur.execute(cmd)
-            con.commit()
-        except:
-            return f"{keys[0]} must be unique"
-
+            """
+        print(cmd)
+        cur.execute(cmd)
+        print( cmd, "\n\n\n")
+        con.commit()
+        
 def special_update(table_name, dict, primes = -1):
     table = tables[table_name]
     with connect('database.db') as con:
         cur = con.cursor()
-        try:
-            cmd = f"""
-                    SELECT ZZZ from {table_name} 
-                    WHERE A = '{dict['UPDATE_SPARE_DATA']}'
-                    AND
-                    D = '{dict['CAT PART NO']}';
-                """
-            cur.execute(cmd)
-            
-            e = cur.fetchone()[0]
-            
-            cmd  = f"""
-                    UPDATE {table_name} 
-                    SET A = '{dict['DET NAME']}', E = {dict["QTY"]}
-                    WHERE ZZZ = {e};
-                """
-            cur.execute(cmd)
-            
-            con.commit()
-        except Exception as e:
-            print(e)
-            return "null"
-
-def load(table_name, keys = "", value = ""):
+        
+        cmd  = f"""
+                UPDATE {table_name} 
+                SET A = '{dict['DET NAME']}', E = {dict["QTY"]}
+                WHERE ZZZ = {dict['UPDATE_SPARE_DATA']};
+            """
+        cur.execute(cmd)
+        
+        con.commit()
+        
+def load(table_name, keys = "", value = "", search_col = -1):
     """
         def load(table_name, key, value):
     """
     table = tables[table_name]
-    key = chr(table['search_column'] + 65)
+    key = chr((table['search_column'] if search_col == -1 else search_col)  + 65)
     keys = [chr(65 + table['columns'].index(key)) for key in keys]
     key_name = table['columns'][table['search_column']]
 
     with connect('database.db') as con:
-        cmd = f'SELECT ZZZ,{ ",".join(keys)} FROM {table_name}'
+        cmd = f'SELECT { ",".join(["ZZZ"] + keys)} FROM {table_name}'
         if value != "":
             cmd += f" WHERE {key}"
             
             if get_type(key_name) == "number":
-                cmd += f" = {cast_type(key_name, value)[0]}"
+                cmd += f" = {cast_type(key_name, value)}"
             else :
                 cmd += f" LIKE '%{value}%'"
             
@@ -92,27 +78,43 @@ def special_load(table_name, keys = "", value = ""):
     table = tables[table_name]
     key = chr(table['search_column'] + 65)
     keys = [chr(65 + table['columns'].index(key)) for key in keys]
+    key_name = table['columns'][table['search_column']]
     
     with connect('database.db') as con:
         cur = con.cursor()
-        cmd = f"SELECT B,C,D,SUM(E) AS E FROM {table_name}" 
+        cmd = f"SELECT ZZZ,B,C,D,SUM(E) AS E FROM {table_name}" 
         if value != "":
-            cmd += f" WHERE {key} LIKE '%{value}%'"
-        cmd += ' GROUP BY B;'
+            cmd += f" WHERE {key}"
+            if get_type(key_name) == "number":
+                cmd += f" = {cast_type(key_name, value)[0]}"
+            else :
+                cmd += f" LIKE '%{value}%'"
+            
+        cmd += ' GROUP BY D;'
         
         path = 'static/files/csv/download.csv'
         df = pd.DataFrame(pd.read_sql_query(cmd, con), columns=keys)
         df.to_csv(path)
-    
-        return df.values.tolist()
+        cur.execute(cmd)
+        print(cmd)
+        x = cur.fetchall()
+        return x
 
-def remove(table_name, prime_key):
+def remove(table_name, prime_key, key_no = -1):
     """
         def remove(table_name, key, value):
     """
+    
+    if key_no != -1:
+        key = chr(65 + key_no)
+        value = cast_type(tables[table_name]['columns'][key_no], prime_key)
+    else:
+        key = "ZZZ"
+        value = prime_key
+
     with connect('database.db') as con:
         cur = con.cursor()
-        cmd = f"DELETE FROM {table_name} WHERE ZZZ={prime_key};"
+        cmd = f"DELETE FROM {table_name} WHERE {key}={value};"
         print(cmd)
         cur.execute(cmd)
         con.commit()

@@ -29,11 +29,14 @@
             <tbody class="table-group-divider">
                 {% for row in table %}
                     <tr scope="row" class="table-data">
-                        {% for i in range(1, row|length) %}
-                            <td class="table-data text-center">{{ row[i] }}</td>
-                        {% endfor %}
-        
-                        <td class="m-0"><a href="/dets/{{ row[0] }}" class="btn btn-primary">VIEW</a></td>
+                        <form method="post" action="/dets/{{ row[1] }}">
+                            {% for i in range(1, row|length) %}
+                                <td class="table-data text-center">{{ row[i] }}</td>
+                                <input type="hidden" name="{{ headers[i][0] }}" value="{{ row[i] }}">
+                            {% endfor %}
+            
+                            <td class="m-0"><input type="submit" value="VIEW" class="btn btn-primary"></td>
+                        </form>    
                         <td class="m-0">
                             <form method="post">
                                 <input type="hidden" name="DELETE" value="{{ row[0] }}">
@@ -46,16 +49,16 @@
                     <tr scope="row">
                         <div >
                             <input type="hidden" name="ADD" value="">
-                            {% for i in range(1, headers|length) %}
+                            {% for i in range(headers_all|length) %}
                                 <td class="table-data" >
-                                    {% if headers[i][1] == "select" %}
-                                        <select name="{{ headers[i][0] }}" id="{{ headers[i][0] }}">
-                                            {% for type in choices[headers[i][0]] %}
+                                    {% if headers_all[i][1] == "select" %}
+                                        <select name="{{ headers_all[i][0] }}" id="{{ headers_all[i][0] }}">
+                                            {% for type in choices[headers_all[i][0]] %}
                                                 <option value="{{ type }}">{{ type }}</option>
                                             {% endfor %}
                                         </select>
                                     {% else %}
-                                        <input type="{{ headers[i][1] }}" name="{{ headers[i][0] }}" placeholder="{{ headers[i][0] }}" id="{{ headers[i][0] }}" class="m-0 w-100" required>
+                                        <input type="{{ headers_all[i][1] }}" name="{{ headers_all[i][0] }}" placeholder="{{ headers_all[i][0] }}" id="{{ headers_all[i][0] }}" class="m-0 w-100" required>
                                     {% endif %}
                                 </td>
                             {% endfor %}

@@ -99,7 +99,6 @@ dets = {
         'LONGITUDE', 
         'LATITUDE',
         "ARMY NO", 
-        "DATE",
         "RANK", 
         "NAME", 
         "TRADE",
@@ -109,6 +108,7 @@ dets = {
     'search_column' : 0,
     #'primary_key' : 1,
 }
+
 spares = {
     'columns' : [
         'DET NAME',
@@ -118,7 +118,7 @@ spares = {
         'QTY', 
     ],
     'search_column' : 3,
-    'primary_key' : 3,
+    'delete_key' : 3,
 }
 tables = { 
     "battle_board" : battle_board_table, 
@@ -161,7 +161,8 @@ def get_type(name, production = False):
     if name not in type:
         if "DATE" in name:
             return "date"
-    
+        if name == "ZZZ":
+            return "number"
         return "text"
 
     c_type = type[name]

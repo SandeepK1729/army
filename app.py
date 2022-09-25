@@ -1,4 +1,3 @@
-from secrets import choice
 from flask import Flask, request, render_template, send_file, session, redirect
 from lib import *
 from flask_session import Session  
@@ -78,34 +77,69 @@ def home():
 @app.route('/dets', methods = ["PUT", "GET", "POST"])
 @login_required
 def dets(name = "dets"):
-    headers = tables[name]['columns']
+    headers_all = tables[name]['columns']
+    headers = headers_all[:6]
     
     if request.method == "POST":
         if "ADD" in request.form:
-            add(table_name = name, keys = headers, dict = request.form)
+            add(table_name = name, keys = headers_all, dict = request.form)
         if "DELETE" in request.form:
             remove(
                 table_name = name, 
-                prime_key = request.form.get("DELETE", -1)
+                prime_key = request.form.get("DELETE", -1),
+                key_no = 1
             )
-        
     data = load(
         table_name = name,
         keys = headers,
         value = request.args.get('search', '')
     )
+    if len(data) == 0:
+        return redirect("/dets")
     
     return render_template(
         "dets.html",
         table = data, 
         choices = choices,
         headers = ["ZZZ"] + [(name, get_type(name)) for name in headers], 
+        headers_all = [(name, get_type(name)) for name in headers_all], 
+        
         title = " ".join(name.split("_")).upper(), 
         name = name,
         search_key = request.args.get("search", "")
     )
 
-#@app.route('/dets/<id>')
+@app.route('/dets/<id>', methods = ["GET", "POST"])
+@login_required
+def det_view(id):
+    name = "dets"
+    headers = tables[name]['columns']
+    print(request.method, request.form)
+    if "ADD" in request.form:
+        print("adding ..")
+        add(table_name = name, keys = headers, dict = request.form)
+    if "DELETE" in request.form:
+        remove(
+            table_name = name, 
+            prime_key = request.form.get("DELETE", -1)
+        )
+    
+    data = load(
+        table_name = name,
+        keys = headers,
+        value = id
+    )
+
+    return render_template(
+        "persons.html",
+        table = data, 
+        headers = [(name, get_type(name)) for name in headers], 
+        
+        title = " ".join(name.split("_")).upper(), 
+        name = name,
+        search_key = request.args.get("search", "")
+    )
+
 @app.route('/spares', methods = ["PUT", "GET", "POST"])
 @login_required
 def spares():
@@ -127,8 +161,8 @@ def spares():
         if "DELETE" in request.form:
             remove(
                 name, 
-                (request.form['CAT PART NO'], request.form['DET NAME']),
-                (3, 0)
+                request.form.get("DELETE"),
+                abnorm = "NON_PRIME_DELETE" not in request.form
             )
             print("delete spares ...")
         if "TRANSFER" in request.form:
@@ -139,9 +173,9 @@ def spares():
         keys = headers,
         value = request.args.get('search', '')
     )
-
-    print("\n\n\n")
+    
     if request.method == "POST" and "show_spare" in request.form:
+        print("hell")
         name_of_spare = request.form.get("NAME OF SPARE")
         cat_part_no = request.form.get("CAT PART NO")
         section_no = request.form.get("SECTION NO")
@@ -167,7 +201,6 @@ def spares():
 
             title = " ".join(name.split("_")).upper(), 
             name = name,
-            update_form = (name == "spares"),
             search_key = request.args.get("search", "")
         )
     
@@ -177,9 +210,9 @@ def spares():
         headers = [(name, get_type(name)) for name in headers], 
         choices = choices, 
         headers_all = [(name, get_type(name)) for name in headers_all],
+        
         title = " ".join(name.split("_")).upper(), 
         name = name,
-        update_form = (name == "spares"),
         search_key = request.args.get("search", "")
     )
 
@@ -231,40 +264,13 @@ def tables_db():
     return render_template(
         "table.html",
         table = data, 
-        headers = ["ZZZ"] + [(name, get_type(name)) for name in headers], 
+        headers = [(name, get_type(name)) for name in headers], 
         title = " ".join(name.split("_")).upper(), 
         name = name,
         choices = choices,
         update_form = (name == "spares"),
         search_key = request.args.get("search", "")
     )
-
-@app.route('/<name>/delete', methods = ("POST", "GET"))
-@login_required
-def delete_rec(name):
-    remove(
-        table_name = name, 
-        values = request.form.get("DELETE", -1)
-    )
-    root = list(request.path.split('/'))[1]
-    return redirect(f'/{root}')
-
-@app.route("/update", methods = ("POST", "GET"))
-@login_required
-def cat_pat(name = "spares"):
-    if name not in tables:
-        print(name)
-        return redirect("/")
-
-    headers = tables[name]['columns']
-
-    if request.method == "POST":
-        update(
-            table_name = name, 
-            col = 'CAT PART NO', 
-            dict = request.form
-        )
-    return redirect(f'/{name}')
 
 @app.route("/download/<name>")
 @login_required
