@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name }}</title>
+
+    <!-- leaflet css  -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .coordinate {
+            position: absolute;
+            bottom: 10px;
+            right: 50%;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background-color: #000000;
+            color: #fff;
+            border: 1px solid red;
+            border-radius: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map">
+        <div class="leaflet-control coordinate"></div>
+    </div>
+</body>
+
+</html>
+
+<!-- leaflet js  -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="./data/point.js"></script>
+<script src="./data/line.js"></script>
+<script src="./data/polygon.js"></script>
+
+
+<script>
+    var api_url = 'http://127.0.0.1:5000/map'
+
+    // Map initialization 
+    var map = L.map('map').setView([20.5937, 78.9629], 5);
+    
+    //osm layer
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    osm.addTo(map);
+
+    // google street 
+    googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+    googleStreets.addTo(map);
+
+    
+    // fetching data 
+    // Defining async function
+    async function getapi(url) {
+        
+        // Storing response
+        const response = await fetch(url);
+        
+        // Storing data in form of JSON
+        var data = await response.json();
+        console.log(data);
+        if (response) {
+            //hideloader();
+        }
+        show(data);
+    }
+    // Calling that async function
+    getapi(api_url);
+    
+    // Function to hide the loader
+    function hideloader() {
+        document.getElementById('loading').style.display = 'none';
+    }
+    function show(data) {
+        // Loop to access all rows 
+        for (let r of data) {
+            var txt = `
+                <h1>${r[1]}</h1>
+                <p>DET TYPE : ${r[2]}</p>
+                <p>ARMY NO : ${r[5]}</p>
+            `;
+            var marker1 = L.marker([r[3], r[4]]);
+            marker1.bindPopup(txt)
+            marker1.addTo(map)
+        }
+        // Setting innerHTML as tab variable
+        document.getElementById("map").innerHTML = tab;
+    }
+</script>

@@ -2,12 +2,9 @@ from sqlite3 import connect
 from data import get_type, tables,choices
 import pandas as pd
 from matplotlib import pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-import pypandoc 
-import pandasql as ps
 
 def cast_type(key, value):
-    return value if get_type(key) == "number" else f"'{value}'"
+    return value if get_type(key) == "number" else f"'{value.strip().capitalize()}'"
     
 def add(table_name, keys, dict):    
     """
@@ -22,9 +19,7 @@ def add(table_name, keys, dict):
             VALUES({",".join([f"{cast_type(key, dict[key])}" for key in keys])});
             
             """
-        print(cmd)
         cur.execute(cmd)
-        print( cmd, "\n\n\n")
         con.commit()
         
 def special_update(table_name, dict, primes = -1):
@@ -61,7 +56,6 @@ def load(table_name, keys = "", value = "", search_col = -1):
                 cmd += f" LIKE '%{value}%'"
             
         cmd += ';'
-        print(cmd)
         
         path = 'static/files/csv/download.csv'
         df = pd.DataFrame(pd.read_sql_query(cmd, con), columns=keys)
@@ -96,7 +90,7 @@ def special_load(table_name, keys = "", value = ""):
         df = pd.DataFrame(pd.read_sql_query(cmd, con), columns=keys)
         df.to_csv(path)
         cur.execute(cmd)
-        print(cmd)
+        
         x = cur.fetchall()
         return x
 
@@ -115,7 +109,7 @@ def remove(table_name, prime_key, key_no = -1):
     with connect('database.db') as con:
         cur = con.cursor()
         cmd = f"DELETE FROM {table_name} WHERE {key}={value};"
-        print(cmd)
+        
         cur.execute(cmd)
         con.commit()
 
@@ -167,10 +161,9 @@ def transfer(table_name, dict):
                 D = '{dict['CAT PART NO']}';
             """
         cur.execute(cmd)
-        print(cmd)
-
+        
         previous_qty, e = cur.fetchone()
-        print(f" p qu : {previous_qty}, {e}")
+        
         # reducing from previous
         cmd  = f"""
                     UPDATE {table_name} 
@@ -178,7 +171,7 @@ def transfer(table_name, dict):
                     WHERE ZZZ = {e};
                 """
         con.commit()
-        print(cmd)
+        
         cur.execute(cmd)
         # adding for new det 
         cmd = f"""
@@ -187,12 +180,12 @@ def transfer(table_name, dict):
             AND
             D = '{dict['CAT PART NO']}';
         """
-        print(cmd)
+        
         cur.execute(cmd)
 
         x = cur.fetchone()
-        print(x)
         
+         
         re = {}
         re['QTY'] = transfer_qty
         re["DET NAME"] = dict["TRANSFER DET NAME"]
@@ -201,7 +194,7 @@ def transfer(table_name, dict):
         re['NAME OF SPARE'] = dict['NAME OF SPARE']
 
         if x is None:
-            print(re)
+            
             
             cmd = f"""
             
@@ -219,7 +212,7 @@ def transfer(table_name, dict):
                     WHERE ZZZ = {e};
                 """
             cur.execute(cmd)
-            print(cmd)
+            
         con.commit()
     
 def all_dets():

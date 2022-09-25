@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styling %}
+    input { margin : 0; }
+{% endblock %}
+
+{% block title_head %}{{ title }}{% endblock %}
+    
+{% block body %}
+
+    <div class="container">
+        <form>
+            <input 
+                type="search" 
+                name="search" 
+                id="search" 
+                class="input-text"
+                value = "{% if search_key %}{{search_key}}{% endif %}"
+            >
+            <input type="submit" value="Search" class="btn btn-secondary">
+            <hr>
+        </form>
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    {% for i in range(6,headers|length) %}
+                        <th scope="col"> {{ headers[i][0] }} </th>
+                    {% endfor %}
+                    <th scope="col">REMOVE</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for row in table %}
+                    <tr scope="row" class="table-data">
+                        {% for i in range(7, row|length) %}
+                            <td class="table-data text-center">{{ row[i] }}</td>
+                        {% endfor %}
+                        <td class="m-0">
+                            <form method="post" action="{{ request.path }}">
+                                <input type="hidden" name="DELETE" value="{{ row[0] }}">
+                                <input type="submit" value="REMOVE" class="btn btn-secondary rounded">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                <form method = "post">
+                    <input type="hidden" name="ADD" value="put">
+                    <tr scope="row">
+                        <div >
+                            {% for i in range(headers|length) %}
+                                {% if i < 6 %}
+                                <input 
+                                        type="hidden" 
+                                        name="{{ headers[i][0] }}" 
+                                        value="{{ table[0][i + 1] }}"
+                                    >
+                                {% else %}
+                                <td class="table-data" >
+                                    
+                                    <input 
+                                        type="{{ headers[i][1] }}" 
+                                        name="{{ headers[i][0] }}" 
+                                        placeholder="{{ headers[i][0] }}" 
+                                        id="{{ headers[i][0] }}" 
+                                        class="m-0 w-100" 
+                                        required
+                                    >
+                                </td>
+                                {% endif %}
+                            {% endfor %}
+                            <td><input type="submit" value="Add" class="btn btn-primary m-0"></td>
+                        
+                        </div>
+                    </tr> 
+                </form>
+            </tbody>
+        </table>
+
+        <a href="/download/{{ name }}" class="btn btn-primary">Download</a>
+        <a href="/dets" class="btn btn-primary">BACK</a>
+        {% if update_form %}
+            {% include 'update_form.html' %}
+        {% endif %}
+        
+    </div>
+
+{% endblock %}

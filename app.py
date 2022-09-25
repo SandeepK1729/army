@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file, session, redirect
+from flask import Flask, request, render_template, send_file, session, redirect, jsonify
 from lib import *
 from flask_session import Session  
 from data import get_type, tables, choices
@@ -16,7 +16,7 @@ globeOne = '1234'
 def login():
     
     if request.method == "POST":
-        print("hello")
+        
         username = request.form.get("username")
         password = request.form.get("password")
         if password == globeOne and username == "admin":
@@ -61,15 +61,13 @@ def dets(name = "dets"):
             remove(
                 table_name = name, 
                 prime_key = request.form.get("DELETE", -1),
-                key_no = 1
+                key_no = 0
             )
     data = load(
         table_name = name,
         keys = headers,
         value = request.args.get('search', '')
     )
-    if len(data) == 0:
-        return redirect("/dets")
     
     return render_template(
         "dets.html",
@@ -88,9 +86,9 @@ def dets(name = "dets"):
 def det_view(id):
     name = "dets"
     headers = tables[name]['columns']
-    print(request.method, request.form)
+    
     if "ADD" in request.form:
-        print("adding ..")
+        
         add(table_name = name, keys = headers, dict = request.form)
     if "DELETE" in request.form:
         remove(
@@ -103,7 +101,9 @@ def det_view(id):
         keys = headers,
         value = id
     )
-
+    if len(data) == 0:
+        return redirect("/dets")
+    
     return render_template(
         "persons.html",
         table = data, 
@@ -125,23 +125,18 @@ def spares():
     if request.method == "POST":
         if "ADD" in request.form:
             add(table_name = name, keys = headers_all, dict = request.form)
-            print("adding ...")
         if "SADD" in request.form:
             add(table_name = name, keys = tables[name]['columns'], dict = request.form)
-            print("Spare Adding ...")
         if "UPDATE_SPARE_DATA" in request.form:
             special_update(name, request.form, primes = ('CAT PART NO', 'DET NAME'))
-            print("updating spares ...")
         if "DELETE" in request.form:
             remove(
                 name, 
                 request.form.get("DELETE"),
                 abnorm = "NON_PRIME_DELETE" not in request.form
             )
-            print("delete spares ...")
         if "TRANSFER" in request.form:
             transfer(table_name = name, dict = request.form)
-            print("transfer spares ..")
     data = special_load(
         table_name = name,
         keys = headers,
@@ -149,7 +144,7 @@ def spares():
     )
     
     if request.method == "POST" and "show_spare" in request.form:
-        print("hell")
+        
         name_of_spare = request.form.get("NAME OF SPARE")
         cat_part_no = request.form.get("CAT PART NO")
         section_no = request.form.get("SECTION NO")
@@ -264,7 +259,20 @@ def print_file(name):
 @app.route("/<name>_map")
 @login_required
 def battle_map(name):
-    return render_template("map.html", name = (" ".join(name.split('_')).upper() + " MAP"))
+    return render_template(
+        "maps.html", 
+        name = (" ".join(name.split('_')).upper() + " MAP")
+    )
+
+@app.route('/map')
+def map_api(name = 'dets'):
+    headers = ['DET NAME', 'DET TYPE', 'LONGITUDE', 'LATITUDE', 'ARMY NO']
+    data = load(
+        table_name = name, 
+        keys = headers, 
+    )
+    
+    return jsonify(data)
 
 @app.errorhandler(404)
 def page_not_found(e):
