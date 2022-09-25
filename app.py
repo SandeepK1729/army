@@ -216,12 +216,13 @@ def tables_db():
         keys = headers,
         value = request.args.get('search', '')
     )
-    print(data)
-    
+    if name == 'recurring_fault_db':
+        plot_recurring()
+
     return render_template(
         "table.html",
         table = data, 
-        headers = [(name, get_type(name)) for name in headers], 
+        headers = ["ZZZ"] + [(name, get_type(name)) for name in headers], 
         title = " ".join(name.split("_")).upper(), 
         name = name,
         choices = choices,

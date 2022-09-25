@@ -69,7 +69,9 @@
                 </form>
             </tbody>
         </table>
-
+        {% if title == 'RECURRING FAULT DB' %}
+        <img src="static/images/result.png" alt="No image availabe" width="400px">
+        {% endif %}
         <a href="/download/{{ name }}" class="btn btn-primary">Download</a>
         <a href="/" class="btn btn-primary">Home</a>
         {% if update_form %}

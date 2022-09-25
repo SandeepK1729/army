@@ -234,3 +234,19 @@ def all_dets():
             choices['DET NAME'] = x
         except:
             pass
+
+def plot_recurring(table_name = 'recurring_fault_db'):
+    with connect('database.db') as con:
+        cur = con.cursor()
+        cmd = lambda x : f"SELECT COUNT(*) FROM {table_name} WHERE D = '{x}';"
+        labels = choices['SYSTEM']
+        ans = []
+        for label in labels:
+            cur.execute(cmd(label))
+            ans.append(cur.fetchone()[0])
+
+        df = pd.DataFrame({
+            "Faults abstract" : ans
+        }, index = labels)
+        plot = df.plot.pie(y = "Faults abstract", figsize = (5, 5))
+        plt.savefig('static/images/result.png')

@@ -108,7 +108,6 @@ dets = {
     'search_column' : 0,
     #'primary_key' : 1,
 }
-
 spares = {
     'columns' : [
         'DET NAME',
@@ -151,11 +150,11 @@ type = {
 }
 choices = {
     'DET TYPE' : ['AVT LR', 'AVT FR', 'MRT', 'MRCT', 'AWD'],
-    'SYSTEM' : ['COOLING', 'WAIN', 'BOOSTER', 'GAIR', 'ENGINE'],
+    'SYSTEM' : ['Lubrication', 'Cooling', 'Air Intake', 'Fuel', 'Txn System', 'Pneumatic'],
     'DET NAME' : [],
 }
-def get_type(name, production = False):
-    
+
+def get_type(name, production = False):   
     Opts = {'select' : 'text', 'number' : 'integer'}
     
     if name not in type:
