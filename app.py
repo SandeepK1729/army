@@ -264,16 +264,35 @@ def battle_map(name):
         name = (" ".join(name.split('_')).upper() + " MAP")
     )
 
-@app.route('/map')
+@app.route('/maps_view', methods = ("GET", "POST"))
+def map_apis(name = 'maps_view'):
+    headers = ['LOCATION NAME', 'LANGITUDE', 'LATITUDE']
+    if request.method == "POST":
+        print(request.form)
+        add(
+            name, 
+            headers, 
+            request.form
+        )   
+        return redirect('battle_map')
+
+    data = load(
+        table_name = name, 
+        keys = headers, 
+    )
+    print(data)
+    return jsonify(data)
+
+@app.route('/maps')
 def map_api(name = 'dets'):
-    headers = ['DET NAME', 'DET TYPE', 'LONGITUDE', 'LATITUDE', 'ARMY NO']
+    headers = ['DET NAME', 'LONGITUDE', 'LATITUDE', 'DET TYPE', 'ARMY NO']
     data = load(
         table_name = name, 
         keys = headers, 
     )
     
     return jsonify(data)
-
+    
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html')

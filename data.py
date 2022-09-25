@@ -119,6 +119,10 @@ spares = {
     'search_column' : 3,
     'delete_key' : 3,
 }
+maps_view = {
+    'columns' : ['LOCATION NAME', 'LANGITUDE', 'LATITUDE'],
+    'search_column' : 0,
+}
 tables = { 
     "battle_board" : battle_board_table, 
     "record_of_work" : record_of_work, 
@@ -128,6 +132,7 @@ tables = {
     "recurring_fault_db" : recurring_fault_db,
     "dets" : dets,
     'spares' : spares,
+    'maps_view' : maps_view,
 }
 type = { 
     'DET TYPE' : 'select',

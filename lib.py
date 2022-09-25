@@ -242,4 +242,7 @@ def plot_recurring(table_name = 'recurring_fault_db'):
             "Faults abstract" : ans
         }, index = labels)
         plot = df.plot.pie(y = "Faults abstract", figsize = (5, 5))
-        plt.savefig('static/images/result.png')
+        plt.legend(loc="upper left")
+        plt.ylabel('')
+        
+        plt.savefig('static/images/result.png', bbox_inches="tight")
