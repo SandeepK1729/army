@@ -259,14 +259,16 @@ def print_file(name):
 @app.route("/<name>_map")
 @login_required
 def battle_map(name):
+    
     return render_template(
         "maps.html", 
-        name = (" ".join(name.split('_')).upper() + " MAP")
+        name = (" ".join(name.split('_')).upper() + " MAP"),
+        headers = [(name, get_type(name)) for name in tables['maps_view']['columns']], 
     )
 
 @app.route('/maps_view', methods = ("GET", "POST"))
 def map_apis(name = 'maps_view'):
-    headers = ['LOCATION NAME', 'LANGITUDE', 'LATITUDE']
+    headers = tables['maps_view']['columns']
     if request.method == "POST":
         print(request.form)
         add(

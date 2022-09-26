@@ -120,7 +120,7 @@ spares = {
     'delete_key' : 3,
 }
 maps_view = {
-    'columns' : ['LOCATION NAME', 'LANGITUDE', 'LATITUDE'],
+    'columns' : ['LOCATION NAME', 'LONGITUDE', 'LATITUDE', 'NAME OF REGT', 'VEH TYPE', 'NATURE OF CAS'],
     'search_column' : 0,
 }
 tables = { 
