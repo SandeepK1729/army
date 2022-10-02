@@ -21,12 +21,27 @@
         <div class="leaflet-control coordinate"></div>
     </div>
     
-    <form method='post' action='/maps_view/battle_map' class="">
-        <label>Do you add casuality ?</label><br>
-        {% for header in headers %}
-        <input id='{{ header[0] }}' name="{{ header[0] }}" type='{{ header[1] }}' placeholder='{{ header[0] }}' autofocus>
+    <form method='post' action='/maps_view/loc_board' class="">
+        <input type="hidden" name="name" value="loc_board">
+        <label>Do you wanna Mark ?</label><br>
+        {% for i in range(headers|length) %}
+            {% if headers[i][1] == "select" %}
+                <select name="{{ headers[i][0] }}" id="{{ headers[i][0] }}">
+                    {% for type in choices[headers[i][0]] %}
+                        <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <input 
+                    type="{{ headers[i][1] }}" 
+                    name="{{ headers[i][0] }}" 
+                    placeholder="{{ headers[i][0] }}" 
+                    id="{{ headers[i][0] }}"
+                    required
+                >
+            {% endif %}
         {% endfor %}
-        <input type="submit" value="ADD" class="btn btn-primary">
+        <input type="submit" value="ADD" class="btn btn-primary" autofocus>
         <a href="/" class="btn btn-secondary">BACK</a>
     </form>
 </body>
@@ -41,14 +56,14 @@
 <script src="{{ url_for('static', filename = 'js/scripts.js')}}"></script>
 
 <script>
+    for(let loc_type of loc_types);
+
     var route = 'http://127.0.0.1:5000/';
-    var api_url = route + 'det_maps'
-    var api_url2 = `${route}maps_view/battle_map`;
-
-    console.log(api_url2);
+    var api_url = `${route}maps_view/loc_board`
+    
+    console.log(api_url)
     getapi(api_url);
-    getapi(api_url2);
-
+    
     map.on('mousemove', function (e) {
         document.getElementById('LONGITUDE').value = Math.round(e.latlng.lng * 100) / 100;
         document.getElementById('LATITUDE').value = Math.round(e.latlng.lat * 100) / 100;

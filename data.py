@@ -96,8 +96,8 @@ dets = {
         "DET NAME",
         'DET TYPE',
         'VEHICLE TYPE',
-        'LONGITUDE', 
         'LATITUDE',
+        'LONGITUDE', 
         "ARMY NO", 
         "RANK", 
         "NAME", 
@@ -119,10 +119,15 @@ spares = {
     'search_column' : 3,
     'delete_key' : 3,
 }
-maps_view = {
-    'columns' : ['LOCATION NAME', 'LONGITUDE', 'LATITUDE', 'NAME OF REGT', 'VEH TYPE', 'NATURE OF CAS'],
+casuality = {
+    'columns' : ['LOCATION NAME', 'LATITUDE', 'LONGITUDE', 'NAME OF REGT', 'VEH TYPE', 'NATURE OF CAS'],
     'search_column' : 0,
 }
+loc_board = {
+    'columns' : ['LOC TYPE', 'LATITUDE', 'LONGITUDE'],
+    'search_column' : 0,
+}
+
 tables = { 
     "battle_board" : battle_board_table, 
     "record_of_work" : record_of_work, 
@@ -132,12 +137,14 @@ tables = {
     "recurring_fault_db" : recurring_fault_db,
     "dets" : dets,
     'spares' : spares,
-    'maps_view' : maps_view,
+    'battle_map' : casuality,
+    'loc_board' : loc_board,
 }
 type = { 
     'DET TYPE' : 'select',
     'SYSTEM' : 'select',
-    
+    'LOC TYPE' : 'select',
+
     "REC VEH" : 'number', 
     "SER" : 'number',
     "UNIT" : 'number', 
@@ -157,7 +164,10 @@ choices = {
     'DET TYPE' : ['AVT LR', 'AVT FR', 'MRT', 'MRCT', 'AWD'],
     'SYSTEM' : ['Lubrication', 'Cooling', 'Air Intake', 'Fuel', 'Txn System', 'Pneumatic'],
     'DET NAME' : [],
+    'LOC TYPE' : ['FMN Headquarters', 'EME Dets Wksp Main', 'EME Dets AWD', 'Ordnance Unit', 'Supply Point', 'ADS']
 }
+
+exclude_capitalize = ['LOC TYPE', 'DET TYPE']
 
 def get_type(name, production = False):   
     Opts = {'select' : 'text', 'number' : 'integer'}

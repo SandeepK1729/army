@@ -1,10 +1,16 @@
 from sqlite3 import connect
-from data import get_type, tables,choices
+from data import get_type, tables,choices, exclude_capitalize
 import pandas as pd
 from matplotlib import pyplot as plt
 
 def cast_type(key, value):
-    return value if get_type(key) == "number" else f"'{value.strip().capitalize()}'"
+    if get_type(key) == "number":
+        return value 
+    else:
+        s = value.strip()
+        if key not in exclude_capitalize:
+            s = s.capitalize()
+        return f"'{s}'"
     
 def add(table_name, keys, dict):    
     """
@@ -230,6 +236,7 @@ def all_dets():
 
 def plot_recurring(table_name = 'recurring_fault_db'):
     with connect('database.db') as con:
+
         cur = con.cursor()
         cmd = lambda x : f"SELECT COUNT(*) FROM {table_name} WHERE D = '{x}';"
         labels = choices['SYSTEM']
@@ -237,12 +244,14 @@ def plot_recurring(table_name = 'recurring_fault_db'):
         for label in labels:
             cur.execute(cmd(label))
             ans.append(cur.fetchone()[0])
-
-        df = pd.DataFrame({
-            "Faults abstract" : ans
-        }, index = labels)
-        plot = df.plot.pie(y = "Faults abstract", figsize = (5, 5))
-        plt.legend(loc="upper left")
-        plt.ylabel('')
-        
-        plt.savefig('static/images/result.png', bbox_inches="tight")
+        try:
+            df = pd.DataFrame({
+                "Faults abstract" : ans
+            }, index = labels)
+            plot = df.plot.pie(y = "Faults abstract", figsize = (5, 5))
+            plt.legend(loc="upper left")
+            plt.ylabel('')
+            
+            plt.savefig('static/images/result.png', bbox_inches="tight")
+        except Exception as e:
+            return "nuu"

@@ -9,45 +9,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
     
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/style.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/style2.css')}}">
     
     <!-- leaflet css  -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        #map {
-            width: 100%;
-            height: 100vh;
-        }
-
-        .coordinate {
-            position: absolute;
-            bottom: 10px;
-            right: 50%;
-        }
-
-        .leaflet-popup-content-wrapper {
-            background-color: #000000;
-            color: #fff;
-            border: 1px solid red;
-            border-radius: 0px;
-        }
-    </style>
 </head>
 
 <body>
     <div id="map">
         <div class="leaflet-control coordinate"></div>
     </div>
-
-    <form method='post' action='/maps_view'>
+    
+    <form method='post' action='/maps_view' class="">
+        <input type="hidden" name="name" value="battle_map">
         <label>Do you add casuality ?</label><br>
         {% for header in headers %}
-        <input name="{{ header[0] }}" type='{{ header[1] }}' placeholder='{{ header[0] }}' autofocus>
+        <input id='{{ header[0] }}' name="{{ header[0] }}" type='{{ header[1] }}' placeholder='{{ header[0] }}' autofocus>
         {% endfor %}
         <input type="submit" value="ADD" class="btn btn-primary">
     </form>
@@ -60,86 +38,21 @@
 <script src="./data/point.js"></script>
 <script src="./data/line.js"></script>
 <script src="./data/polygon.js"></script>
-
+<script src="{{ url_for('static', filename = 'js/scripts.js')}}"></script>
 
 <script>
     var route = 'http://127.0.0.1:5000/';
     var api_url = route + 'maps'
     var api_url2 = route + 'maps_view';
 
-    // Map initialization 
-    var map = L.map('map').setView([28.0229, 73.3119], 5);
     
-    //osm layer
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-    osm.addTo(map);
-
-    // google street 
-    googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-    });
-    googleStreets.addTo(map);
-
-    var cas = L.icon({
-        iconUrl: 'static/images/cas.png',
-        iconSize: [50, 50],
-    });
-    var det = L.icon({
-        iconUrl: 'static/images/det.png',
-        iconSize: [50, 50],
-    });
-    // fetching data 
-    // Defining async function
-    async function getapi(url) {
-        
-        // Storing response
-        const response = await fetch(url);
-        
-        // Storing data in form of JSON
-        var data = await response.json();
-        console.log(data);
-        if (response) {
-            //hideloader();
-        }
-        show(data);
-    }
-    
-    // Function to hide the loader
-    function hideloader() {
-        document.getElementById('loading').style.display = 'none';
-    }
-    function show(data) {
-        // Loop to access all rows 
-        for (let r of data) {
-            var txt = `
-                <h1>${r[1]}</h1>
-                <p>LONGITUDE : ${r[2]}</P>
-                <p>LATITUDE : ${r[3]}</P>
-                    
-            `;
-            if (r.length == 6) {
-                txt += `<p>DET TYPE : ${r[4]}</p>
-                    <p>ARMY NO : ${r[5]}</p>
-                `;
-            } else {
-                txt += `<p>NAME OF REGT : ${r[4]}</p>
-                <p>VEH TYPE : ${r[5]}</p>
-                <p>NATURE OF CAS : ${r[5]}</p>
-                `;
-            }
-
-            console.log(r)
-            var marker1 = L.marker([r[2], r[3]], { icon : ((r.length == 6) ? det : cas)});
-            marker1.bindPopup(txt).openPopup
-            marker1.addTo(map)
-        }
-    }
     getapi(api_url);
     getapi(api_url2);
+
     map.on('mousemove', function (e) {
-        document.getElementsByClassName('coordinate')[0].innerHTML = 'lat: ' + e.latlng.lat + 'lng: ' + e.latlng.lng;
+        document.getElementById('LONGITUDE').value = Math.round(e.latlng.lng * 100) / 100;
+        document.getElementById('LATITUDE').value = Math.round(e.latlng.lat * 100) / 100;
+        
+        //document.getElementsByClassName('coordinate')[0].innerHTML = 'lat: ' + e.latlng.lat + 'lng: ' + e.latlng.lng;
     })
 </script>

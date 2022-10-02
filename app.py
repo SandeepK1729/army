@@ -256,43 +256,57 @@ def print_file(name):
         download_name = f"{name}.pdf"
     )
 
-@app.route("/<name>_map")
+@app.route("/battle_map")
 @login_required
-def battle_map(name):
-    
+def battle_map(name = 'battle_map'): 
     return render_template(
-        "maps.html", 
-        name = (" ".join(name.split('_')).upper() + " MAP"),
-        headers = [(name, get_type(name)) for name in tables['maps_view']['columns']], 
+        "battle_map.html", 
+        name = (" ".join(name.split('_')).upper()),
+        headers = [(name, get_type(name)) for name in tables[name]['columns']], 
+        choices = choices,
     )
 
-@app.route('/maps_view', methods = ("GET", "POST"))
-def map_apis(name = 'maps_view'):
-    headers = tables['maps_view']['columns']
+@app.route("/loc_board")
+@login_required
+def loc_board(name = 'loc_board'): 
+    return render_template(
+        "loc_board.html", 
+        name = (" ".join(name.split('_')).upper()),
+        headers = [(name, get_type(name)) for name in tables['loc_board']['columns']], 
+        choices = choices,
+    )
+
+
+@app.route('/maps_view/<name>', methods = ("GET", "POST"))
+def map_apis(name):
+    headers = tables[name]['columns']
     if request.method == "POST":
-        print(request.form)
+        
         add(
             name, 
             headers, 
             request.form
         )   
-        return redirect('battle_map')
+        
+        return redirect('/'+name)
 
+    print(name)
+    data = load(
+        table_name = name, 
+        keys = headers, 
+    )
+
+    print(data)
+    return jsonify(data)
+
+@app.route('/det_maps')
+def map_api(name = 'dets'):
+    headers = ['DET NAME', 'LATITUDE', 'LONGITUDE', 'DET TYPE', 'ARMY NO']
     data = load(
         table_name = name, 
         keys = headers, 
     )
     print(data)
-    return jsonify(data)
-
-@app.route('/maps')
-def map_api(name = 'dets'):
-    headers = ['DET NAME', 'LONGITUDE', 'LATITUDE', 'DET TYPE', 'ARMY NO']
-    data = load(
-        table_name = name, 
-        keys = headers, 
-    )
-    
     return jsonify(data)
     
 @app.errorhandler(404)
