@@ -290,13 +290,12 @@ def map_apis(name):
         
         return redirect('/'+name)
 
-    print(name)
+    
     data = load(
         table_name = name, 
         keys = headers, 
     )
 
-    print(data)
     return jsonify(data)
 
 @app.route('/det_maps')
