@@ -82,12 +82,13 @@ function show(data) {
             `;
         }
         console.log(r);
-        if(r.length > 4) { 
+        if(r.length > 5) { 
             marker1 = L.marker([r[2], r[3]], { icon : ((r.length == 6) ? icons['det'] : icons['cas'])});
-            marker1.bindPopup(txt).openPopup 
+            marker1.bindPopup(txt).openPopup;
         }
         else {
             marker1 = L.marker([r[2], r[3]], { icon : icons[r[1]] });
+            marker1.bindPopup(`<h1>${r[1]}</h1>`).openPopup;
         }
         marker1.addTo(map)
     }

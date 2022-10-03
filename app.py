@@ -257,25 +257,17 @@ def print_file(name):
     )
 
 @app.route("/battle_map")
+@app.route("/loc_board")
+@app.route("/casuality")
 @login_required
-def battle_map(name = 'battle_map'): 
+def battle_map(): 
+    name = list(request.path.split('/'))[-1]
     return render_template(
-        "battle_map.html", 
+        f"{name}.html", 
         name = (" ".join(name.split('_')).upper()),
         headers = [(name, get_type(name)) for name in tables[name]['columns']], 
         choices = choices,
     )
-
-@app.route("/loc_board")
-@login_required
-def loc_board(name = 'loc_board'): 
-    return render_template(
-        "loc_board.html", 
-        name = (" ".join(name.split('_')).upper()),
-        headers = [(name, get_type(name)) for name in tables['loc_board']['columns']], 
-        choices = choices,
-    )
-
 
 @app.route('/maps_view/<name>', methods = ("GET", "POST"))
 def map_apis(name):

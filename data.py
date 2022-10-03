@@ -120,7 +120,11 @@ spares = {
     'delete_key' : 3,
 }
 casuality = {
-    'columns' : ['LOCATION NAME', 'LATITUDE', 'LONGITUDE', 'NAME OF REGT', 'VEH TYPE', 'NATURE OF CAS'],
+    'columns' : ['CASUALITY NAME', 'LATITUDE', 'LONGITUDE', 'VEH TYPE', 'NATURE OF CAS'],
+    'search_column' : 0,
+}
+battle_map = {
+    'columns' : ['LOCATION NAME', 'LATITUDE', 'LONGITUDE', 'NAME'], 
     'search_column' : 0,
 }
 loc_board = {
@@ -137,8 +141,9 @@ tables = {
     "recurring_fault_db" : recurring_fault_db,
     "dets" : dets,
     'spares' : spares,
-    'battle_map' : casuality,
+    'casuality' : casuality,
     'loc_board' : loc_board,
+    'battle_map' : battle_map,
 }
 type = { 
     'DET TYPE' : 'select',
@@ -169,7 +174,7 @@ choices = {
     'LOCATION NAME' : ['Own Forces', 'EN Forces', 'Eng Det', 'AAD', 'Signal', 'Artillery'],
 }
 
-exclude_capitalize = ['LOC TYPE', 'DET TYPE']
+exclude_capitalize = ['LOC TYPE', 'DET TYPE', 'LOCATION NAME']
 
 def get_type(name, production = False):   
     Opts = {'select' : 'text', 'number' : 'integer'}
