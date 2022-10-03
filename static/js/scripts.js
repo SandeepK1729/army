@@ -92,5 +92,5 @@ function show(data, type) {
 }
 
 var paths = window.location.href.split('/');
-var route = `http://${paths[2]}/`; 
+var route = `${paths[0]}://${paths[2]}/`; 
         
