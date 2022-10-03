@@ -8,7 +8,5 @@
 
 <h2> Tasks </h2>
 <ol>
-          <li>det master table</li>
-          <li>assign in spares</li>
-          <li>view of assigns</li>
+          <li>Traffic Map</li>
 </ol>
