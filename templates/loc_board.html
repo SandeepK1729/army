@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -44,29 +44,26 @@
         <input type="submit" value="ADD" class="btn btn-primary" autofocus>
         <a href="/" class="btn btn-secondary">BACK</a>
     </form>
-</body>
+    <!-- leaflet js  -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="./data/point.js"></script>
+    <script src="./data/line.js"></script>
+    <script src="./data/polygon.js"></script>
+    <script src="{{ url_for('static', filename = 'js/scripts.js')}}"></script>
 
-</html>
+    <script>
 
-<!-- leaflet js  -->
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="./data/point.js"></script>
-<script src="./data/line.js"></script>
-<script src="./data/polygon.js"></script>
-<script src="{{ url_for('static', filename = 'js/scripts.js')}}"></script>
-
-<script>
-
-    var route = 'http://127.0.0.1:5000/';
-    var api_url = `${route}maps_view/loc_board`
-    
-    console.log(api_url)
-    getapi(api_url);
-    
-    map.on('mousemove', function (e) {
-        document.getElementById('LONGITUDE').value = Math.round(e.latlng.lng * 100) / 100;
-        document.getElementById('LATITUDE').value = Math.round(e.latlng.lat * 100) / 100;
+        var route = window.location.href.split('/')[2];
+        var api_url = `${route}maps_view/loc_board`
         
-        //document.getElementsByClassName('coordinate')[0].innerHTML = 'lat: ' + e.latlng.lat + 'lng: ' + e.latlng.lng;
-    })
-</script>
+        getapi(api_url);
+        
+        map.on('mousemove', function (e) {
+            document.getElementById('LONGITUDE').value = Math.round(e.latlng.lng * 100) / 100;
+            document.getElementById('LATITUDE').value = Math.round(e.latlng.lat * 100) / 100;
+            
+            //document.getElementsByClassName('coordinate')[0].innerHTML = 'lat: ' + e.latlng.lat + 'lng: ' + e.latlng.lng;
+        })
+    </script>
+</body>
+</html>
