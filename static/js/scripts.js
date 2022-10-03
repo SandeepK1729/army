@@ -42,7 +42,7 @@ for(let loc_type of loc_types) {
 }
 // fetching data 
 // Defining async function
-async function getapi(url) {
+async function getapi(url, type = 'none') {
     
     // Storing response
     const response = await fetch(url);
@@ -53,43 +53,40 @@ async function getapi(url) {
     if (response) {
         //hideloader();
     }
-    show(data);
+    show(data, type);
 }
 
 // Function to hide the loader
 function hideloader() {
     document.getElementById('loading').style.display = 'none';
 }
-function show(data) {
+function show(data, type) {
     // Loop to access all rows 
     for (let r of data) {
         var marker1;
-        
+        var icon_key = r[1];
+
         var txt = `
-            <h1>${r[1]}</h1>
+            <h2>${r[1]}</h2>
             <p>LATITUDE : ${r[2]}</P>
             <p>LONGITUDE : ${r[3]}</P>
                 
         `;
-        if (r.length == 6) {
+        if (type == 'det') {
             txt += `<p>DET TYPE : ${r[4]}</p>
                 <p>ARMY NO : ${r[5]}</p>
             `;
-        } else if (r.length == 7) {
-            txt += `<p>NAME OF REGT : ${r[4]}</p>
-            <p>VEH TYPE : ${r[5]}</p>
-            <p>NATURE OF CAS : ${r[6]}</p>
+            icon_key = 'det';
+        } else if (type == 'cas') {
+            txt += `<p>VEH TYPE : ${r[4]}</p>
+            <p>NATURE OF CAS : ${r[5]}</p>
             `;
+            icon_key = 'cas';
         }
         console.log(r);
-        if(r.length > 5) { 
-            marker1 = L.marker([r[2], r[3]], { icon : ((r.length == 6) ? icons['det'] : icons['cas'])});
-            marker1.bindPopup(txt).openPopup;
-        }
-        else {
-            marker1 = L.marker([r[2], r[3]], { icon : icons[r[1]] });
-            marker1.bindPopup(`<h1>${r[1]}</h1>`).openPopup;
-        }
+        
+        marker1 = L.marker([r[2], r[3]], { icon : icons[icon_key] });
+        marker1.bindPopup(txt).openPopup;
         marker1.addTo(map)
     }
 }

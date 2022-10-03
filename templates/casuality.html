@@ -21,7 +21,7 @@
         <div class="leaflet-control coordinate"></div>
     </div>
     
-    <form method='post' action='/maps_view/battle_map' class="">
+    <form method='post' action='/maps_view/casuality' class="">
         <label>Do you add casuality ?</label><br>
         {% for i in range(headers|length) %}
             {% if headers[i][1] == "select" %}
@@ -57,9 +57,11 @@
 <script>
     var route = 'http://127.0.0.1:5000/';
     var api_url = `${route}maps_view/casuality`;
+    var api_url2 = route + 'det_maps';
 
-    getapi(api_url);
-    
+    getapi(api_url, 'cas');
+    getapi(api_url2, 'det');
+
     map.on('mousemove', function (e) {
         document.getElementById('LONGITUDE').value = Math.round(e.latlng.lng * 100) / 100;
         document.getElementById('LATITUDE').value = Math.round(e.latlng.lat * 100) / 100;
