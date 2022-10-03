@@ -23,8 +23,22 @@
     
     <form method='post' action='/maps_view/battle_map' class="">
         <label>Do you add casuality ?</label><br>
-        {% for header in headers %}
-        <input id='{{ header[0] }}' name="{{ header[0] }}" type='{{ header[1] }}' placeholder='{{ header[0] }}' autofocus>
+        {% for i in range(headers|length) %}
+            {% if headers[i][1] == "select" %}
+                <select name="{{ headers[i][0] }}" id="{{ headers[i][0] }}">
+                    {% for type in choices[headers[i][0]] %}
+                        <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <input 
+                    type="{{ headers[i][1] }}" 
+                    name="{{ headers[i][0] }}" 
+                    placeholder="{{ headers[i][0] }}" 
+                    id="{{ headers[i][0] }}"
+                    required
+                >
+            {% endif %}
         {% endfor %}
         <input type="submit" value="ADD" class="btn btn-primary">
         <a href="/" class="btn btn-secondary">BACK</a>

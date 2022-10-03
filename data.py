@@ -144,6 +144,7 @@ type = {
     'DET TYPE' : 'select',
     'SYSTEM' : 'select',
     'LOC TYPE' : 'select',
+    'LOCATION NAME' : 'select',
 
     "REC VEH" : 'number', 
     "SER" : 'number',
@@ -164,7 +165,8 @@ choices = {
     'DET TYPE' : ['AVT LR', 'AVT FR', 'MRT', 'MRCT', 'AWD'],
     'SYSTEM' : ['Lubrication', 'Cooling', 'Air Intake', 'Fuel', 'Txn System', 'Pneumatic'],
     'DET NAME' : [],
-    'LOC TYPE' : ['FMN Headquarters', 'EME Dets Wksp Main', 'EME Dets AWD', 'Ordnance Unit', 'Supply Point', 'ADS']
+    'LOC TYPE' : ['FMN Headquarters', 'EME Dets Wksp Main', 'EME Dets AWD', 'Ordnance Unit', 'Supply Point', 'ADS', 'AVT LR', 'AVT FR'],
+    'LOCATION NAME' : ['Own Forces', 'EN Forces', 'Eng Det', 'AAD', 'Signal', 'Artillery'],
 }
 
 exclude_capitalize = ['LOC TYPE', 'DET TYPE']

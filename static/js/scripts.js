@@ -22,7 +22,15 @@ var loc_types = [
     'Supply Point', 
     'ADS',
     'cas',
-    'det',
+    'det', 
+    'AVT LR', 
+    'AVT FR',
+    'Own Forces', 
+    'EN Forces', 
+    'Eng Det', 
+    'AAD', 
+    'Signal', 
+    'Artillery',
 ]
 
 var icons = {}
