@@ -90,3 +90,7 @@ function show(data, type) {
         marker1.addTo(map)
     }
 }
+
+var paths = window.location.href.split('/');
+var route = `http://${paths[2]}/`; 
+        
